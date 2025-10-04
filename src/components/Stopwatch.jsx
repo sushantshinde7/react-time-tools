@@ -57,13 +57,7 @@ export default function Stopwatch() {
   
   return (
     <div className="stopwatch-container">
-      <div className="tabs">
-        <span className="tab">Alarm</span>
-        <span className="tab">Clock</span>
-        <span className="tab active">Stopwatch</span>
-        <span className="tab">Timer</span>
-      </div>
-
+      
       <div className="timer-wrapper">
         <div className="circle">
           {[...Array(TICKS)].map((_, i) => {

@@ -17,3 +17,22 @@
   margin-bottom: 12px; /* space between title and card */
 }
 
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  font-size: 17px;
+  color: #5c5c5c;
+  cursor: pointer;
+}
+
+.tab {
+  padding: 2px 8px;
+  transition: color 0.2s;
+}
+
+.tab.active {
+  color: #e90000;
+  border-bottom: 2px solid #db0101;
+  font-weight: bold;
+}

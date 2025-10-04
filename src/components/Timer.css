@@ -1,0 +1,51 @@
+.timer-container {
+  max-width: 320px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(70,80,130,0.07);
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+}
+
+.timer-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.circle {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timer-display {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #222;
+  margin-top: 20px;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+button {
+  min-width: 80px;
+  padding: 6px 20px;
+  font-size: 15px;
+  border-radius: 10px;
+  border: none;
+  cursor: not-allowed;
+  background: #fabf98;
+  color: #e90000;
+}
