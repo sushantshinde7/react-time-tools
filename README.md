@@ -1,16 +1,52 @@
-# React + Vite
+🕒 React Time Utilities
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A sleek, minimal React + Vite project that brings together multiple time-based utilities — Stopwatch, Alarm, Clock, and Timer — all in one clean interface.
 
-Currently, two official plugins are available:
+🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🧭 Tabbed Navigation to switch between tools easily.
 
-## React Compiler
+⏱️ Fully functional Stopwatch with laps and smooth circular UI.
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+⏰ Alarm, 🕓 Clock, and ⏲️ Timer placeholders (coming soon).
 
-## Expanding the ESLint configuration
+💅 Built with modern UI components and CSS animations for smooth interactions.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+⚡ Powered by React + Vite for fast development and instant updates.
+
+🛠️ Tech Stack
+
+Frontend: React, Vite
+
+Styling: CSS3
+
+Build Tools: ESLint, Babel (via Vite)
+
+📦 Getting Started
+
+Clone and run locally:
+
+git clone https://github.com/<your-username>/<your-repo>.git
+cd <your-repo>
+npm install
+npm run dev
+
+
+Then open your browser at http://localhost:5173
+ 🚀
+
+🧩 Roadmap
+
+ Stopwatch UI + Functionality
+
+ Alarm Feature
+
+ Timer Functionality
+
+ Clock View
+
+ Enhanced UI/UX & Animations
+
+📄 License
+
+This project is open-source and available under the MIT License.
