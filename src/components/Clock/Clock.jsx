@@ -1,5 +1,5 @@
 import React from "react";
-import "./Stopwatch.css";
+import "./Clock.css";
 
 export default function Clock() {
   return (
