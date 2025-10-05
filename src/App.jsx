@@ -1,46 +1,49 @@
-import React, { useState } from "react";
+// src/App.jsx
+import React, { Suspense, lazy } from "react";
+import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from "react-router-dom";
 import "./App.css";
-import Stopwatch from "./components/Stopwatch";
-import Alarm from "./components/Alarm";
-import Clock from "./components/Clock";
-import Timer from "./components/Timer";
+
+// lazy load components for better performance (optional)
+const Stopwatch = lazy(() => import("./components/Stopwatch/Stopwatch"));
+const Alarm = lazy(() => import("./components/Alarm/Alarm"));
+const Clock = lazy(() => import("./components/Clock/Clock"));
+const Timer = lazy(() => import("./components/Timer/Timer"));
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState("Stopwatch");
-
-  const renderTab = () => {
-    switch (activeTab) {
-      case "Alarm":
-        return <Alarm />;
-      case "Clock":
-        return <Clock />;
-      case "Stopwatch":
-        return <Stopwatch />;
-      case "Timer":
-        return <Timer />;
-      default:
-        return <Stopwatch />;
-    }
-  };
-
   return (
-    <div className="app-root">
-      <h1 className="app-title">{activeTab}</h1>
+    <Router>
+      <div className="app-root">
+        <h1 className="app-title">Time Tools</h1>
 
-      <div className="tabs">
-        {["Alarm", "Clock", "Stopwatch", "Timer"].map((tab) => (
-          <span
-            key={tab}
-            className={`tab ${activeTab === tab ? "active" : ""}`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </span>
-        ))}
+        <nav className="tabs" role="tablist" aria-label="Time tools">
+          <NavLink to="/alarm" className={({ isActive }) => `tab ${isActive ? "active" : ""}`}>
+            Alarm
+          </NavLink>
+          <NavLink to="/clock" className={({ isActive }) => `tab ${isActive ? "active" : ""}`}>
+            Clock
+          </NavLink>
+          <NavLink to="/stopwatch" className={({ isActive }) => `tab ${isActive ? "active" : ""}`}>
+            Stopwatch
+          </NavLink>
+          <NavLink to="/timer" className={({ isActive }) => `tab ${isActive ? "active" : ""}`}>
+            Timer
+          </NavLink>
+        </nav>
+
+        <main className="tab-content">
+          <Suspense fallback={<div style={{textAlign:"center", padding:20}}>Loading…</div>}>
+            <Routes>
+              <Route path="/" element={<Navigate replace to="/stopwatch" />} />
+              <Route path="/stopwatch" element={<Stopwatch />} />
+              <Route path="/alarm" element={<Alarm />} />
+              <Route path="/clock" element={<Clock />} />
+              <Route path="/timer" element={<Timer />} />
+              {/* 404 fallback */}
+              <Route path="*" element={<div style={{padding:20}}>Page not found</div>} />
+            </Routes>
+          </Suspense>
+        </main>
       </div>
-
-      <div className="tab-content">{renderTab()}</div>
-    </div>
+    </Router>
   );
 }
-

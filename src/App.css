@@ -3,8 +3,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;  /* Full screen height */
-  width: 100vw;   /* Full screen width */
+  height: 100vh;
+  /* Full screen height */
+  width: 100vw;
+  /* Full screen width */
   background: #f9fafc;
   text-align: center;
 }
@@ -14,7 +16,8 @@
   font-size: 28px;
   font-weight: 600;
   color: #e90000;
-  margin-bottom: 12px; /* space between title and card */
+  margin-bottom: 12px;
+  /* space between title and card */
 }
 
 .tabs {
@@ -27,8 +30,8 @@
 }
 
 .tab {
+  cursor: pointer;
   padding: 2px 8px;
-  transition: color 0.2s;
 }
 
 .tab.active {
