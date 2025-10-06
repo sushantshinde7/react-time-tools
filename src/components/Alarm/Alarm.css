@@ -2,7 +2,7 @@
 .alarm-container {
   max-width: 320px;
   margin: 30px auto;
-  padding: 20px;
+  padding: 20px 10px 40px;
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 4px 24px rgba(70,80,130,0.07);

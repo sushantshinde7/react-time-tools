@@ -11,17 +11,11 @@ export default function Clock() {
         <div className="timer-display">🕒 Clock Feature Coming Soon!</div>
       </div>
 
-      <div className="button-row">
-        <button className="start-btn" disabled>
-          Start
-        </button>
-        <button className="pause-btn" disabled>
-          Pause
-        </button>
-        <button className="reset-btn" disabled>
-          Reset
-        </button>
-      </div>
+      {/*<div className="button-row">
+        <button className="start-btn" disabled>Start</button>
+        <button className="pause-btn" disabled>Pause</button>
+        <button className="reset-btn" disabled>Reset</button>
+      </div>*/}
     </div>
   );
 }

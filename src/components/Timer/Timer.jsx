@@ -8,11 +8,11 @@ export default function Timer() {
         <div className="circle"></div>
         <div className="timer-display">⏱ Timer Feature Coming Soon!</div>
       </div>
-      <div className="button-row">
+      {/*<div className="button-row">
         <button className="start-btn" disabled>Start</button>
         <button className="pause-btn" disabled>Pause</button>
         <button className="reset-btn" disabled>Reset</button>
-      </div>
+      </div>*/}
     </div>
   );
 }
