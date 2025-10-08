@@ -1,175 +1,133 @@
-/* ========== MAIN CONTAINER ========== */
 .stopwatch-container {
-  max-width: 320px;
-  margin: 30px auto;
-  padding: 20px 10px 40px;
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 4px 24px rgba(70, 80, 130, 0.07);
-  font-family: "Inter", "Segoe UI", Arial, sans-serif;
-}
-
-/* ========== TOP TABS ========== */
-.tabs {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 18px;
-  font-size: 17px;
-  color: #5c5c5c;
-}
-
-.tab {
-  padding: 2px 8px;
-  cursor: pointer;
-}
-
-.tab.active {
-  color: #e90000;
-  border-bottom: 2px solid #db0101;
-  font-weight: bold;
-}
-
-/* ========== DISPLAY ========== */
-.timer-display {
-  position: absolute;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #222;
-  background: #fff;
-  padding: 10px;
-  border-radius: 12px;
-  font-family: 'Courier New', Courier, monospace; /* stable digits */
-  font-variant-numeric: tabular-nums;
-  width: 120px; /* keeps layout steady */
+  width: 320px;
+  padding: 28px 20px 36px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
   text-align: center;
 }
 
-/* ========== BUTTONS ========== */
-.button-row {
-  display: flex;
-  justify-content: center;
-  gap: 13px;
-  margin-top: 20px;
-}
-
-button {
-  min-width: 90px;
-  padding: 10px 0;
-  font-size: 17px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  outline: none;
-  background: none;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-}
-
-/* Remove default browser hover/active/focus styles */
-button:focus,
-button:active {
-  outline: none;
-  box-shadow: none;
-}
-button::-moz-focus-inner {
-  border: 0;
-}
-
-.start-btn {
-  background: #e90000;
-  color: #fff;
-  padding: 6px 30px;
-}
-.start-btn:hover {
-  background: #c70000;
-  transform: scale(1.03);
-}
-
-.pause-btn {
-  background: #fff;
-  color: #e90000;
-  border: 1.2px solid #e90000;
-  padding: 6px 30px;
-}
-.pause-btn:hover {
-  background: #ffeaea;
-  transform: scale(1.03);
-}
-
-.reset-btn,
-.lap-btn {
-  background: #fabf98;
-  color: #e90000;
-}
-.reset-btn:hover,
-.lap-btn:hover {
-  background: #f9b080;
-  transform: scale(1.03);
-}
-
-/* ========== LAPS LIST ========== */
-.laps-list {
-  margin-top: 16px;
-  padding: 0 5px;
-}
-
-.lap-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 15px;
-  margin-bottom: 3px;
-  color: #444;
-}
-
-/* ========== TIMER CIRCLE ========== */
-.timer-wrapper {
+/* ======= TIMER CIRCLE ======= */
+.stopwatch-wrapper {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 40px;
+  margin-top: 20px;
 }
 
-.circle {
+.stopwatch-circle {
   position: relative;
-  width: 220px;
-  height: 220px;
+  width: 210px;
+  height: 210px;
   border-radius: 50%;
+  background: radial-gradient(circle, #fff 40%, #f3f3f3 100%);
+  box-shadow: 0 0 10px rgba(233, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* ========== TICKS ========== */
-/* optimized for 120 ticks — thinner, shorter, smoother */
+/* small ticks */
 .tick {
   position: absolute;
-  top: 50%;
+  top: 47%;
   left: 50%;
-  width: 1.4px;
-  height: 8px;
+  width: 1px;
+  height: 7px;
   background: #ccc;
+  opacity: 0.4;
   transform-origin: center bottom;
-  opacity: 0.6;
   border-radius: 1px;
-  transition: background 0.18s ease, opacity 0.18s ease;
 }
 
 .tick.active {
-  background: #ff0000;
+  background: #ff3333;
   opacity: 1;
 }
 
-/* ========== RED DOT ========== */
-/* kept your visual position exactly the same */
 .red-dot {
   position: absolute;
-  top: 54%;
-  left: 47%;
-  width: 6.5px;
-  height: 6.5px;
-  background: red;
+  top: 49%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  background: #ff0000;
   border-radius: 50%;
   transform-origin: center center;
-  transition: transform 0.09s linear;
+  box-shadow: 0 0 6px #ff0000;
 }
+
+/* ======= DISPLAY ======= */
+.stopwatch-display {
+  position: absolute;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #111;
+  background: #fff;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-family: "Roboto Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ======= BUTTONS ======= */
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+button {
+  min-width: 90px;
+  padding: 10px 0;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.start-btn {
+  background: linear-gradient(135deg, #ff3333, #cc0000);
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(255, 51, 51, 0.4);
+}
+.start-btn:hover { transform: translateY(-2px); }
+
+.pause-btn {
+  background: #fff;
+  color: #e90000;
+  border: 1.4px solid #e90000;
+}
+.pause-btn:hover { background: #ffeaea; transform: scale(1.03); }
+
+.reset-btn, .lap-btn {
+  background: #fabf98;
+  color: #e90000;
+}
+.reset-btn:hover, .lap-btn:hover {
+  background: #f9b080;
+  transform: scale(1.03);
+}
+
+/* ======= LAPS ======= */
+.laps-list {
+  margin-top: 14px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+.lap-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  color: #333;
+  padding: 6px 4px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.lap-row:last-child { border-bottom: none; }
+
+
