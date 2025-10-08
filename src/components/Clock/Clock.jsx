@@ -3,12 +3,12 @@ import "./Clock.css";
 
 export default function Clock() {
   return (
-    <div className="stopwatch-container">
-      <div className="timer-wrapper">
-        <div className="circle">
+    <div className="clock-container">
+      <div className="clock-wrapper">
+        <div className="clock-circle">
           {/* Optional: placeholder for future Clock UI */}
         </div>
-        <div className="timer-display">🕒 Clock Feature Coming Soon!</div>
+        <div className="clock-display">🕒 Clock Feature Coming Soon!</div>
       </div>
 
       {/*<div className="button-row">

@@ -5,7 +5,7 @@ export default function Timer() {
   return (
     <div className="timer-container">
       <div className="timer-wrapper">
-        <div className="circle"></div>
+        <div className="timer-circle"></div>
         <div className="timer-display">⏱ Timer Feature Coming Soon!</div>
       </div>
       {/*<div className="button-row">

@@ -58,8 +58,8 @@ export default function Stopwatch() {
   return (
     <div className="stopwatch-container">
       
-      <div className="timer-wrapper">
-        <div className="circle">
+      <div className="stopwatch-wrapper">
+        <div className="stopwatch-circle">
           {[...Array(TICKS)].map((_, i) => {
             const isPast = i <= ticksPassed;
             return (
@@ -81,7 +81,7 @@ export default function Stopwatch() {
           />
         </div>
 
-        <div className="timer-display">{formatTime(time)}</div>
+        <div className="stopwatch-display">{formatTime(time)}</div>
       </div>
 
       <div className="button-row">

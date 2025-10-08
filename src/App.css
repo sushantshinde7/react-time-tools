@@ -1,41 +1,70 @@
+/* ======= APP LAYOUT ======= */
 .app-root {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
   height: 100vh;
-  /* Full screen height */
   width: 100vw;
-  /* Full screen width */
-  background: #f9fafc;
-  text-align: center;
-}
-
-.app-title {
+  background: linear-gradient(135deg, #fdfbfb, #ebedee);
   font-family: "Inter", sans-serif;
-  font-size: 28px;
-  font-weight: 600;
-  color: #e90000;
-  margin-bottom: 12px;
-  /* space between title and card */
+  overflow: hidden;
 }
 
+/* ======= HEADER ======= */
+.app-title {
+  font-size: 26px;
+  font-weight: 600;
+  color: #e60023;
+  margin-top: 24px;
+  letter-spacing: 0.5px;
+}
+
+/* ======= CONTENT AREA ======= */
+.tab-content {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  animation: fadeIn 0.3s ease;
+}
+
+/* ======= BOTTOM NAVIGATION ======= */
 .tabs {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 18px;
-  font-size: 17px;
-  color: #5c5c5c;
-  cursor: pointer;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  width: 100%;
+  padding: 12px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  position: fixed;
+  bottom: 0;
+  left: 0;
 }
 
 .tab {
-  cursor: pointer;
-  padding: 2px 8px;
+  text-decoration: none;
+  color: #666;
+  font-size: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.2s ease;
 }
 
 .tab.active {
   color: #e90000;
-  border-bottom: 2px solid #db0101;
-  font-weight: bold;
+  font-weight: 600;
+  transform: scale(1.05);
+}
+
+/* removed red dot indicator */
+
+/* ======= ANIMATIONS ======= */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
