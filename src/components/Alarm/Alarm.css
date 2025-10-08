@@ -1,7 +1,7 @@
 /* Reuse base layout but can override colors/fonts */
 .alarm-container {
   max-width: 320px;
-  margin: 30px auto;
+  margin: 5px auto;
   padding: 20px 10px 40px;
   background: #fff;
   border-radius: 18px;

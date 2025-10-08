@@ -1,7 +1,7 @@
 /* ========== MAIN CONTAINER ========== */
 .stopwatch-container {
   max-width: 340px;
-  margin: 40px auto;
+  margin: 5px auto;
   padding: 28px 18px 36px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.6);
@@ -9,7 +9,6 @@
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
   font-family: "Inter", "Segoe UI", sans-serif;
 }
-
 
 /* ========== TOP TABS ========== */
 .tabs {
