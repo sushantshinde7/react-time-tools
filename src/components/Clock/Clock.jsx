@@ -47,12 +47,7 @@ const Clock = () => {
       ) {
         setShowCityList(false);
       }
-
-      if (
-        editMode &&
-        navRef.current &&
-        !navRef.current.contains(event.target)
-      ) {
+      if (editMode && navRef.current && !navRef.current.contains(event.target)) {
         setEditMode(false);
       }
     };
@@ -98,6 +93,7 @@ const Clock = () => {
               city={city}
               editMode={editMode}
               onRemove={handleRemoveCity}
+              showAnalog={true} // pass prop to show analog clock
             />
           ))
         )}
