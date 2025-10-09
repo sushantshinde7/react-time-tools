@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import "./Clock.css";
+import CityClock from "./CityClock";
 
 const ALL_CITIES = [
   { name: "New York", gmt: "GMT-4" },
@@ -36,7 +37,7 @@ const Clock = () => {
     []
   );
 
-  /** Close both popups if clicked outside */
+  /** Close popups if clicked outside */
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -92,19 +93,12 @@ const Clock = () => {
           <p className="placeholder">No cities added</p>
         ) : (
           cities.map((city) => (
-            <div key={city.name} className="city-item">
-              <span>
-                {city.name} <small>({city.gmt})</small>
-              </span>
-              {editMode && (
-                <button
-                  className="remove-btn"
-                  onClick={() => handleRemoveCity(city.name)}
-                >
-                  ✕
-                </button>
-              )}
-            </div>
+            <CityClock
+              key={city.name}
+              city={city}
+              editMode={editMode}
+              onRemove={handleRemoveCity}
+            />
           ))
         )}
       </div>

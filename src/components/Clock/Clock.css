@@ -74,21 +74,34 @@
 .city-item {
   width: 100%;
   background: #f1f5f9;
-  /* light gray strip */
   padding: 10px 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border: 1px solid #e2e8f0;
   color: #1e293b;
-  /* city name dark */
   font-weight: 500;
+  box-sizing: border-box; /* prevents overflow due to padding */
 }
 
 .city-item small {
   color: #475569;
-  /* GMT secondary info */
   font-size: 13px;
+}
+
+/* Keep city name grouped */
+.city-info {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fix digital time spacing and prevent clipping */
+.city-time {
+  font-family: monospace;
+  font-size: 16px;
+  margin-left: 16px;
+  white-space: nowrap; /* prevent line break or cut-off */
+  flex-shrink: 0; /* ensures time doesn’t get squished */
 }
 
 /* Remove button */
