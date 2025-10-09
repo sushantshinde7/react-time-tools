@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import "./Clock.css";
 
 const ALL_CITIES = [
@@ -18,53 +18,52 @@ const Clock = () => {
   const [cities, setCities] = useState([]);
   const [showCityList, setShowCityList] = useState(false);
   const [editMode, setEditMode] = useState(false);
+
   const popupRef = useRef(null);
-  const navRef = useRef(null); // new ref for container nav
+  const navRef = useRef(null);
 
-  const handleAddCity = (city) => {
-    if (!cities.find((c) => c.name === city.name)) {
-      setCities([...cities, city]);
-    }
+  /** Add city if not already present */
+  const handleAddCity = useCallback((city) => {
+    setCities((prev) =>
+      prev.some((c) => c.name === city.name) ? prev : [...prev, city]
+    );
     setShowCityList(false);
-  };
+  }, []);
 
-  const handleRemoveCity = (cityName) => {
-    setCities(cities.filter((c) => c.name !== cityName));
-  };
+  /** Remove city from list */
+  const handleRemoveCity = useCallback(
+    (cityName) => setCities((prev) => prev.filter((c) => c.name !== cityName)),
+    []
+  );
 
-  // Close add-city popup if click outside
+  /** Close both popups if clicked outside */
   useEffect(() => {
-    const handleClickOutsidePopup = (event) => {
-      if (popupRef.current && !popupRef.current.contains(event.target)) {
+    const handleClickOutside = (event) => {
+      if (
+        popupRef.current &&
+        !popupRef.current.contains(event.target) &&
+        !event.target.classList.contains("add-btn")
+      ) {
         setShowCityList(false);
       }
-    };
-    if (showCityList) {
-      document.addEventListener("mousedown", handleClickOutsidePopup);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutsidePopup);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutsidePopup);
-    };
-  }, [showCityList]);
 
-  // Close edit mode if click outside nav
-  useEffect(() => {
-    const handleClickOutsideNav = (event) => {
-      if (editMode && navRef.current && !navRef.current.contains(event.target)) {
+      if (
+        editMode &&
+        navRef.current &&
+        !navRef.current.contains(event.target)
+      ) {
         setEditMode(false);
       }
     };
-    if (editMode) {
-      document.addEventListener("mousedown", handleClickOutsideNav);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutsideNav);
+
+    if (showCityList || editMode) {
+      document.addEventListener("mousedown", handleClickOutside);
     }
+
     return () => {
-      document.removeEventListener("mousedown", handleClickOutsideNav);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [editMode]);
+  }, [showCityList, editMode]);
 
   return (
     <div className="clock-container">
@@ -72,7 +71,7 @@ const Clock = () => {
       <div className="clock-nav" ref={navRef}>
         <button
           className={`nav-btn ${editMode ? "active" : ""}`}
-          onClick={() => setEditMode(!editMode)}
+          onClick={() => setEditMode((prev) => !prev)}
         >
           {editMode ? "Done" : "Edit"}
         </button>
@@ -81,38 +80,40 @@ const Clock = () => {
 
         <button
           className="nav-btn add-btn"
-          onClick={() => setShowCityList(!showCityList)}
+          onClick={() => setShowCityList((prev) => !prev)}
         >
           +
         </button>
       </div>
 
-      {/* City List (added) */}
+      {/* Added Cities */}
       <div className="city-list">
-        {cities.length === 0 && <p className="placeholder">No cities added</p>}
-
-        {cities.map((city) => (
-          <div key={city.name} className="city-item">
-            <span>
-              {city.name} <small>({city.gmt})</small>
-            </span>
-            {editMode && (
-              <button
-                className="remove-btn"
-                onClick={() => handleRemoveCity(city.name)}
-              >
-                ✕
-              </button>
-            )}
-          </div>
-        ))}
+        {cities.length === 0 ? (
+          <p className="placeholder">No cities added</p>
+        ) : (
+          cities.map((city) => (
+            <div key={city.name} className="city-item">
+              <span>
+                {city.name} <small>({city.gmt})</small>
+              </span>
+              {editMode && (
+                <button
+                  className="remove-btn"
+                  onClick={() => handleRemoveCity(city.name)}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          ))
+        )}
       </div>
 
       {/* Add City Popup */}
       {showCityList && (
         <div className="city-popup" ref={popupRef}>
           {ALL_CITIES.map((city) => {
-            const alreadyAdded = !!cities.find((c) => c.name === city.name);
+            const alreadyAdded = cities.some((c) => c.name === city.name);
             return (
               <button
                 key={city.name}
@@ -131,4 +132,3 @@ const Clock = () => {
 };
 
 export default Clock;
-
