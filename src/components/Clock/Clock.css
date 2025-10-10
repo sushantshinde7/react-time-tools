@@ -70,7 +70,7 @@
 .city-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
   max-height: 310px;
   overflow-y: scroll;
   /* keep scrolling */
@@ -135,7 +135,9 @@
   color: #ef4444;
   font-size: 16px;
   cursor: pointer;
-  transition: color 0.2s, transform 0.2s;
+  transition: color 0.15s;
+  z-index: 3;          /* ensure clickable above drag overlay */
+  pointer-events: auto; /* ensure it handles clicks */
 }
 
 .remove-btn:hover {
@@ -147,6 +149,16 @@
   color: #94a3b8;
   text-align: center;
   margin-top: 30px;
+}
+.nav-btn.active {
+  background-color: #e0f2fe; /* light blue for edit */
+  color: #2563eb;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+.add-btn.active {
+  background-color: #fef3c7; /* light yellow for popup active */
+  border-radius: 6px;
 }
 
 /* Popup List for Adding Cities */
@@ -225,3 +237,36 @@
   color: #9ca3af;
   cursor: not-allowed;
 }
+.draggable-item {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* spacing between handle, clock, name, time */
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 10px;
+  height: 2px;
+  border-radius: 6px;
+  color: #64748b;
+  cursor: grab;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.draggable-item.dragging {
+  background: rgba(37, 99, 235, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.draggable-item.dragging .drag-handle {
+  cursor: grabbing;
+  color: #2563eb;
+}
+
+
