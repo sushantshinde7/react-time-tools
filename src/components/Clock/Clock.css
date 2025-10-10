@@ -1,15 +1,22 @@
 .clock-container {
-  width: 320px;
-  min-height: 400px;
+  width: 340px;
+  /* slightly wider for comfort */
+  min-height: 420px;
   background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  /* softer, more elevated shadow */
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
   color: #1e293b;
-  /* default dark text */
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  /* smoother hover feedback */
+}
+
+.clock-container:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 /* Navigation Bar */
@@ -17,10 +24,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
+  padding: 12px 16px;
   border-bottom: 1px solid #e2e8f0;
   background: #f8fafc;
-  border-radius: 12px;
+  border-radius: 14px 14px 0 0;
+  /* match container curve */
   margin-bottom: 10px;
 }
 
@@ -31,21 +39,18 @@
   cursor: pointer;
   color: #2563eb;
   font-weight: 500;
-  transition: 0.2s;
+  transition: color 0.2s, transform 0.2s;
 }
 
 .nav-btn:hover {
   color: #1d4ed8;
-}
-
-.nav-btn.active {
-  color: #dc2626;
+  transform: scale(1.15);
+  /* slight interactive feel */
 }
 
 .nav-title {
   font-size: 18px;
   font-weight: 600;
-  margin: 0;
   color: #1e293b;
   /* dark title */
 }
@@ -53,6 +58,12 @@
 .add-btn {
   font-size: 22px;
   line-height: 18px;
+  transition: transform 0.2s;
+}
+
+.add-btn:hover {
+  transform: rotate(90deg);
+  /* small playful rotation */
 }
 
 /* Added City List */
@@ -61,10 +72,14 @@
   flex-direction: column;
   gap: 8px;
   max-height: 310px;
-  overflow-y: scroll;     /* keep scrolling */
-  overflow-x: hidden;    /* hide horizontal scroll */
-  box-sizing: border-box; /* include padding in width */
-  scrollbar-width: none;  /* Firefox */
+  overflow-y: scroll;
+  /* keep scrolling */
+  overflow-x: hidden;
+  /* hide horizontal scroll */
+  box-sizing: border-box;
+  /* include padding in width */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .city-list::-webkit-scrollbar {
@@ -81,11 +96,17 @@
   border: 1px solid #e2e8f0;
   color: #1e293b;
   font-weight: 500;
-  box-sizing: border-box; /* prevents overflow due to padding */
+  box-sizing: border-box;
+  /* prevents overflow due to padding */
+}
+
+.city-item:hover {
+  background: #f1f5f9;
+  transform: translateY(-2px);
 }
 
 .city-item small {
-  color: #475569;
+  color: #64748b;
   font-size: 13px;
 }
 
@@ -93,15 +114,18 @@
 .city-info {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 /* Fix digital time spacing and prevent clipping */
 .city-time {
-  font-family: monospace;
+  font-family: 'Roboto Mono', monospace;
   font-size: 16px;
   margin-left: 16px;
-  white-space: nowrap; /* prevent line break or cut-off */
-  flex-shrink: 0; /* ensures time doesn’t get squished */
+  white-space: nowrap;
+  /* prevent line break or cut-off */
+  flex-shrink: 0;
+  /* ensures time doesn’t get squished */
 }
 
 /* Remove button */
@@ -111,11 +135,12 @@
   color: #ef4444;
   font-size: 16px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: color 0.2s, transform 0.2s;
 }
 
 .remove-btn:hover {
   color: #dc2626;
+  transform: scale(1.2);
 }
 
 .placeholder {
@@ -127,39 +152,51 @@
 /* Popup List for Adding Cities */
 .city-popup {
   position: absolute;
-  top: 60px;
+  top: 80px;
   left: 0;
   right: 0;
   background: #ebebeb;
   border-top: 1px solid #e5e7eb;
   border-bottom: 1px solid #e5e7eb;
-  max-height: 280px;
-  overflow-y: auto;        /* scrollable */
-  overflow-x: hidden;      /* hide horizontal scroll */
+  max-height: 240px;
+  overflow-y: auto;
+  /* scrollable */
+  overflow-x: hidden;
+  /* hide horizontal scroll */
   display: flex;
   flex-direction: column;
   z-index: 10;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   box-sizing: border-box;
-  padding: 0 5px;          /* optional: prevent horizontal overflow */
-  
+  padding: 0 5px;
+  /* optional: prevent horizontal overflow */
+  backdrop-filter: blur(4px);
   /* Firefox thin scrollbar */
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent; /* thumb color, track transparent */
+  scrollbar-color: #cbd5e1 transparent;
+  /* thumb color, track transparent */
 }
 
 /* Chrome, Safari, Edge */
 .city-popup::-webkit-scrollbar {
-  width: 6px;              /* thin scrollbar width */
+  width: 6px;
+  /* thin scrollbar width */
 }
 
 .city-popup::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1; /* thumb color */
-  border-radius: 3px;        /* rounded thumb */
+  background-color: #cbd5e1;
+  /* thumb color */
+  border-radius: 3px;
+  /* rounded thumb */
+}
+
+.city-popup::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
 }
 
 .city-popup::-webkit-scrollbar-track {
-  background: transparent;   /* track transparent */
+  background: transparent;
+  /* track transparent */
 }
 
 .city-option {
