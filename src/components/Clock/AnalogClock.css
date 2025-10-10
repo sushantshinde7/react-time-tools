@@ -32,6 +32,7 @@
   transition: background-color 0.3s;
   background-color: red; 
   clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+  box-shadow: 0 0 2px rgba(255, 0, 0, 0.5); /* subtle glow */
 }
 
 /* Minute hand */
@@ -43,21 +44,19 @@
   left: 50%;
   transform-origin: bottom center;
   border-radius: 2px;
-  transition: background-color 0.3s, transform 0.1s linear;
+  transition: transform 0.1s linear;
   clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
 }
 
 /* Hands color based on day/night */
 
 .analog-clock.day .minute-hand {
-  background-color: #000; /* black hands on white background */
+  background-color: #0f172a;
 }
-
 
 .analog-clock.night .minute-hand {
-  background-color: #fff; /* white hands on dark background */
+  background-color: #f1f5f9;
 }
-
 /* Second dot on border */
 .second-dot {
   position: absolute;

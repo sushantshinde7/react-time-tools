@@ -13,6 +13,7 @@ const ALL_CITIES = [
   { name: "Moscow", gmt: "GMT+3" },
   { name: "Toronto", gmt: "GMT-4" },
   { name: "Los Angeles", gmt: "GMT-7" },
+  { name: "Mumbai", gmt: "GMT+5.5" }, // Added half-hour example
 ];
 
 const Clock = () => {
@@ -23,21 +24,15 @@ const Clock = () => {
   const popupRef = useRef(null);
   const navRef = useRef(null);
 
-  /** Add city if not already present */
   const handleAddCity = useCallback((city) => {
-    setCities((prev) =>
-      prev.some((c) => c.name === city.name) ? prev : [...prev, city]
-    );
+    setCities((prev) => (prev.some((c) => c.name === city.name) ? prev : [...prev, city]));
     setShowCityList(false);
   }, []);
 
-  /** Remove city from list */
-  const handleRemoveCity = useCallback(
-    (cityName) => setCities((prev) => prev.filter((c) => c.name !== cityName)),
-    []
-  );
+  const handleRemoveCity = useCallback((cityName) => {
+    setCities((prev) => prev.filter((c) => c.name !== cityName));
+  }, []);
 
-  /** Close popups if clicked outside */
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -55,51 +50,31 @@ const Clock = () => {
     if (showCityList || editMode) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showCityList, editMode]);
 
   return (
     <div className="clock-container">
-      {/* Top Navigation */}
       <div className="clock-nav" ref={navRef}>
-        <button
-          className={`nav-btn ${editMode ? "active" : ""}`}
-          onClick={() => setEditMode((prev) => !prev)}
-        >
+        <button className={`nav-btn ${editMode ? "active" : ""}`} onClick={() => setEditMode((p) => !p)}>
           {editMode ? "Done" : "Edit"}
         </button>
-
         <h2 className="nav-title">World Clock</h2>
-
-        <button
-          className="nav-btn add-btn"
-          onClick={() => setShowCityList((prev) => !prev)}
-        >
+        <button className="nav-btn add-btn" onClick={() => setShowCityList((p) => !p)}>
           +
         </button>
       </div>
 
-      {/* Added Cities */}
       <div className="city-list">
         {cities.length === 0 ? (
           <p className="placeholder">No cities added</p>
         ) : (
           cities.map((city) => (
-            <CityClock
-              key={city.name}
-              city={city}
-              editMode={editMode}
-              onRemove={handleRemoveCity}
-              showAnalog={true} // pass prop to show analog clock
-            />
+            <CityClock key={city.name} city={city} editMode={editMode} onRemove={handleRemoveCity} />
           ))
         )}
       </div>
 
-      {/* Add City Popup */}
       {showCityList && (
         <div className="city-popup" ref={popupRef}>
           {ALL_CITIES.map((city) => {

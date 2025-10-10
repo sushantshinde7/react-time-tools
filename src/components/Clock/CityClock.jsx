@@ -2,13 +2,19 @@ import React, { useState, useEffect } from "react";
 import AnalogClock from "./AnalogClock";
 import "./Clock.css";
 
+const parseGMTOffset = (gmt) => {
+  const match = gmt.match(/GMT([+-]?\d+(?:\.\d+)?)/);
+  return match ? parseFloat(match[1]) : 0;
+};
+
 const CityClock = ({ city, editMode, onRemove }) => {
   const [time, setTime] = useState("");
 
   useEffect(() => {
     const updateTime = () => {
-      const offset = parseInt(city.gmt.replace("GMT", ""), 10);
-      const utc = new Date().getTime() + new Date().getTimezoneOffset() * 60000;
+      const offset = parseGMTOffset(city.gmt);
+      const now = new Date();
+      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
       const cityDate = new Date(utc + offset * 3600000);
       const hours = cityDate.getHours();
       const minutes = cityDate.getMinutes();
@@ -38,3 +44,4 @@ const CityClock = ({ city, editMode, onRemove }) => {
 };
 
 export default CityClock;
+
