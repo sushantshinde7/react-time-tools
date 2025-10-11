@@ -19,42 +19,60 @@ const ALL_CITIES = [
 ];
 
 const Clock = () => {
-  const [cities, setCities] = useState([]);
+  const [cities, setCities] = useState(() => {
+    const saved = localStorage.getItem("cities");
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [showCityList, setShowCityList] = useState(false);
   const [editMode, setEditMode] = useState(false);
 
   const popupRef = useRef(null);
   const navRef = useRef(null);
 
+  // ✅ Save cities to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("cities", JSON.stringify(cities));
+  }, [cities]);
+
+  // ✅ Add city (prevents duplicates)
   const handleAddCity = useCallback((city) => {
-    setCities((prev) => (prev.some((c) => c.name === city.name) ? prev : [...prev, city]));
+    setCities((prev) => {
+      if (prev.some((c) => c.name === city.name)) return prev;
+      return [...prev, city];
+    });
     setShowCityList(false);
   }, []);
 
+  // ✅ Remove city
   const handleRemoveCity = useCallback((cityName) => {
     setCities((prev) => prev.filter((c) => c.name !== cityName));
   }, []);
 
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
-    const items = Array.from(cities);
-    const [reordered] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reordered);
-    setCities(items);
-  };
+  // ✅ Reorder city list
+  const handleDragEnd = useCallback(
+    (result) => {
+      if (!result.destination) return;
+      const updated = Array.from(cities);
+      const [moved] = updated.splice(result.source.index, 1);
+      updated.splice(result.destination.index, 0, moved);
+      setCities(updated);
+    },
+    [cities]
+  );
 
+  // ✅ Hide popup/edit when clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
+      const clickedOutsidePopup =
         popupRef.current &&
         !popupRef.current.contains(event.target) &&
-        !event.target.classList.contains("add-btn")
-      ) {
-        setShowCityList(false);
-      }
-      if (editMode && navRef.current && !navRef.current.contains(event.target)) {
-        setEditMode(false);
-      }
+        !event.target.closest(".add-btn");
+      const clickedOutsideNav =
+        navRef.current && !navRef.current.contains(event.target);
+
+      if (clickedOutsidePopup) setShowCityList(false);
+      if (editMode && clickedOutsideNav) setEditMode(false);
     };
 
     if (showCityList || editMode) {
@@ -65,20 +83,36 @@ const Clock = () => {
 
   return (
     <div className="clock-container">
+      {/* Navbar */}
       <div className="clock-nav" ref={navRef}>
-        <button className={`nav-btn ${editMode ? "active" : ""}`} onClick={() => setEditMode((p) => !p)}>
+        <button
+          className={`nav-btn ${editMode ? "active" : ""}`}
+          onClick={() => setEditMode((p) => !p)}
+          aria-pressed={editMode}
+        >
           {editMode ? "Done" : "Edit"}
         </button>
+
         <h2 className="nav-title">World Clock</h2>
-        <button className="nav-btn add-btn" onClick={() => setShowCityList((p) => !p)}>
+
+        <button
+          className="nav-btn add-btn"
+          onClick={() => setShowCityList((p) => !p)}
+          aria-expanded={showCityList}
+        >
           +
         </button>
       </div>
 
+      {/* City List */}
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="city-list">
           {(provided) => (
-            <div className="city-list" {...provided.droppableProps} ref={provided.innerRef}>
+            <div
+              className="city-list"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
               {cities.length === 0 ? (
                 <p className="placeholder">No cities added</p>
               ) : (
@@ -87,29 +121,35 @@ const Clock = () => {
                     key={city.name}
                     draggableId={city.name}
                     index={index}
-                    isDragDisabled={!editMode} // Only draggable in edit mode
+                    isDragDisabled={!editMode}
                   >
                     {(provided, snapshot) => (
                       <div
                         ref={provided.innerRef}
-                        {...provided.draggableProps}               // draggable props on wrapper
-                        className={`draggable-item ${snapshot.isDragging ? "dragging" : ""}`}
+                        {...provided.draggableProps}
+                        className={`draggable-item ${
+                          snapshot.isDragging ? "dragging" : ""
+                        }`}
                       >
-                        {/* drag handle — apply dragHandleProps only to this element */}
+                        {/* Drag handle */}
                         {editMode && (
                           <div
                             {...provided.dragHandleProps}
                             className="drag-handle"
-                            aria-label={`Drag ${city.name}`}
                             role="button"
-                            onMouseDown={(e) => e.stopPropagation()} // prevent parent mousedown handlers
+                            tabIndex={0}
+                            aria-label={`Drag ${city.name}`}
+                            onMouseDown={(e) => e.stopPropagation()}
                           >
                             ☰
                           </div>
                         )}
 
-                        {/* CityClock (contains remove button) */}
-                        <CityClock city={city} editMode={editMode} onRemove={handleRemoveCity} />
+                        <CityClock
+                          city={city}
+                          editMode={editMode}
+                          onRemove={handleRemoveCity}
+                        />
                       </div>
                     )}
                   </Draggable>
@@ -121,6 +161,7 @@ const Clock = () => {
         </Droppable>
       </DragDropContext>
 
+      {/* Popup City Selector */}
       {showCityList && (
         <div className="city-popup" ref={popupRef}>
           {ALL_CITIES.map((city) => {
@@ -131,6 +172,7 @@ const Clock = () => {
                 className={`city-option ${alreadyAdded ? "selected" : ""}`}
                 onClick={() => handleAddCity(city)}
                 disabled={alreadyAdded}
+                aria-disabled={alreadyAdded}
               >
                 {city.name} <small>{city.gmt}</small>
               </button>
