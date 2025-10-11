@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import "./Clock.css";
 import CityClock from "./CityClock";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 const ALL_CITIES = [
+  { name: "New Delhi", gmt: "GMT+5.5" },
+  { name: "Mumbai", gmt: "GMT+5.5" },
   { name: "New York", gmt: "GMT-4" },
   { name: "London", gmt: "GMT+1" },
   { name: "Tokyo", gmt: "GMT+9" },
@@ -13,7 +16,6 @@ const ALL_CITIES = [
   { name: "Moscow", gmt: "GMT+3" },
   { name: "Toronto", gmt: "GMT-4" },
   { name: "Los Angeles", gmt: "GMT-7" },
-  { name: "Mumbai", gmt: "GMT+5.5" }, // Added half-hour example
 ];
 
 const Clock = () => {
@@ -32,6 +34,14 @@ const Clock = () => {
   const handleRemoveCity = useCallback((cityName) => {
     setCities((prev) => prev.filter((c) => c.name !== cityName));
   }, []);
+
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    const items = Array.from(cities);
+    const [reordered] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reordered);
+    setCities(items);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -65,15 +75,51 @@ const Clock = () => {
         </button>
       </div>
 
-      <div className="city-list">
-        {cities.length === 0 ? (
-          <p className="placeholder">No cities added</p>
-        ) : (
-          cities.map((city) => (
-            <CityClock key={city.name} city={city} editMode={editMode} onRemove={handleRemoveCity} />
-          ))
-        )}
-      </div>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="city-list">
+          {(provided) => (
+            <div className="city-list" {...provided.droppableProps} ref={provided.innerRef}>
+              {cities.length === 0 ? (
+                <p className="placeholder">No cities added</p>
+              ) : (
+                cities.map((city, index) => (
+                  <Draggable
+                    key={city.name}
+                    draggableId={city.name}
+                    index={index}
+                    isDragDisabled={!editMode} // Only draggable in edit mode
+                  >
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}               // draggable props on wrapper
+                        className={`draggable-item ${snapshot.isDragging ? "dragging" : ""}`}
+                      >
+                        {/* drag handle — apply dragHandleProps only to this element */}
+                        {editMode && (
+                          <div
+                            {...provided.dragHandleProps}
+                            className="drag-handle"
+                            aria-label={`Drag ${city.name}`}
+                            role="button"
+                            onMouseDown={(e) => e.stopPropagation()} // prevent parent mousedown handlers
+                          >
+                            ☰
+                          </div>
+                        )}
+
+                        {/* CityClock (contains remove button) */}
+                        <CityClock city={city} editMode={editMode} onRemove={handleRemoveCity} />
+                      </div>
+                    )}
+                  </Draggable>
+                ))
+              )}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
 
       {showCityList && (
         <div className="city-popup" ref={popupRef}>
@@ -97,3 +143,4 @@ const Clock = () => {
 };
 
 export default Clock;
+

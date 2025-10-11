@@ -1,18 +1,15 @@
 .clock-container {
   width: 340px;
-  /* slightly wider for comfort */
   min-height: 420px;
-  background: #ffffff;
+  background: #ffffff; /* main container stays white */
   border-radius: 18px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-  /* softer, more elevated shadow */
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  color: #1e293b;
+  color: #1e293b; /* main text dark */
   transition: box-shadow 0.3s ease, transform 0.2s ease;
-  /* smoother hover feedback */
 }
 
 .clock-container:hover {
@@ -26,9 +23,8 @@
   align-items: center;
   padding: 12px 16px;
   border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
+  background: #f8fafc; /* slight contrast vs container */
   border-radius: 14px 14px 0 0;
-  /* match container curve */
   margin-bottom: 10px;
 }
 
@@ -37,7 +33,7 @@
   border: none;
   font-size: 16px;
   cursor: pointer;
-  color: #2563eb;
+  color: #2563eb; /* primary accent */
   font-weight: 500;
   transition: color 0.2s, transform 0.2s;
 }
@@ -45,14 +41,12 @@
 .nav-btn:hover {
   color: #1d4ed8;
   transform: scale(1.15);
-  /* slight interactive feel */
 }
 
 .nav-title {
   font-size: 18px;
   font-weight: 600;
-  color: #1e293b;
-  /* dark title */
+  color: #1e293b; /* dark title */
 }
 
 .add-btn {
@@ -63,23 +57,18 @@
 
 .add-btn:hover {
   transform: rotate(90deg);
-  /* small playful rotation */
 }
 
-/* Added City List */
+/* City List */
 .city-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   max-height: 310px;
   overflow-y: scroll;
-  /* keep scrolling */
   overflow-x: hidden;
-  /* hide horizontal scroll */
   box-sizing: border-box;
-  /* include padding in width */
   scrollbar-width: none;
-  /* Firefox */
 }
 
 .city-list::-webkit-scrollbar {
@@ -88,54 +77,54 @@
 
 .city-item {
   width: 100%;
-  background: #f1f5f9;
+  background: #f5f5f5; /* slightly darker than container for contrast */
   padding: 10px 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid #e2e8f0;
-  color: #1e293b;
+  border-radius: 10px;
+  color: #0f172a; /* dark text for readability */
   font-weight: 500;
   box-sizing: border-box;
-  /* prevents overflow due to padding */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* subtle lift */
+  transition: transform 0.2s, background 0.2s;
 }
 
 .city-item:hover {
-  background: #f1f5f9;
   transform: translateY(-2px);
+  background: #e9ecef; /* slightly darker on hover */
 }
 
 .city-item small {
-  color: #64748b;
+  color: #475569; /* secondary text */
   font-size: 13px;
 }
 
-/* Keep city name grouped */
 .city-info {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-/* Fix digital time spacing and prevent clipping */
 .city-time {
   font-family: 'Roboto Mono', monospace;
   font-size: 16px;
   margin-left: 16px;
   white-space: nowrap;
-  /* prevent line break or cut-off */
   flex-shrink: 0;
-  /* ensures time doesn’t get squished */
+  color: #0f172a; /* dark time for visibility */
 }
 
 /* Remove button */
 .remove-btn {
   background: none;
   border: none;
-  color: #ef4444;
+  color: #ef4444; /* red for remove */
   font-size: 16px;
   cursor: pointer;
-  transition: color 0.2s, transform 0.2s;
+  transition: color 0.15s, transform 0.2s;
+  z-index: 3;
+  pointer-events: auto;
 }
 
 .remove-btn:hover {
@@ -149,45 +138,49 @@
   margin-top: 30px;
 }
 
-/* Popup List for Adding Cities */
+/* Active states for buttons */
+.nav-btn.active {
+  background-color: #e0f2fe; /* light blue for edit */
+  color: #2563eb;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.add-btn.active {
+  background-color: #fef3c7; /* light yellow for popup active */
+  border-radius: 6px;
+}
+
+/* Popup list */
 .city-popup {
   position: absolute;
   top: 80px;
   left: 0;
   right: 0;
-  background: #ebebeb;
+  background: #f8f9fa; /* slightly darker than container */
   border-top: 1px solid #e5e7eb;
   border-bottom: 1px solid #e5e7eb;
   max-height: 240px;
   overflow-y: auto;
-  /* scrollable */
   overflow-x: hidden;
-  /* hide horizontal scroll */
   display: flex;
   flex-direction: column;
   z-index: 10;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   box-sizing: border-box;
   padding: 0 5px;
-  /* optional: prevent horizontal overflow */
   backdrop-filter: blur(4px);
-  /* Firefox thin scrollbar */
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
-  /* thumb color, track transparent */
 }
 
-/* Chrome, Safari, Edge */
 .city-popup::-webkit-scrollbar {
   width: 6px;
-  /* thin scrollbar width */
 }
 
 .city-popup::-webkit-scrollbar-thumb {
   background-color: #cbd5e1;
-  /* thumb color */
   border-radius: 3px;
-  /* rounded thumb */
 }
 
 .city-popup::-webkit-scrollbar-thumb:hover {
@@ -196,7 +189,6 @@
 
 .city-popup::-webkit-scrollbar-track {
   background: transparent;
-  /* track transparent */
 }
 
 .city-option {
@@ -205,8 +197,7 @@
   text-align: left;
   padding: 12px 16px;
   font-size: 15px;
-  color: #1e293b;
-  /* city name dark */
+  color: #0f172a; /* dark text for popup */
   cursor: pointer;
   font-weight: 500;
   transition: 0.2s;
@@ -214,7 +205,6 @@
 
 .city-option small {
   color: #475569;
-  /* GMT secondary info */
 }
 
 .city-option:hover:not(:disabled) {
@@ -225,3 +215,48 @@
   color: #9ca3af;
   cursor: not-allowed;
 }
+
+/* Drag item styling */
+.draggable-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  color: #64748b;
+  cursor: grab;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.draggable-item.dragging {
+  background: rgba(37, 99, 235, 0.08); /* subtle highlight while dragging */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.draggable-item.dragging .drag-handle {
+  cursor: grabbing;
+  color: #2563eb;
+}
+.add-btn:focus-visible,
+.nav-btn:focus-visible {
+  outline: 2px solid #94a3b8;
+  outline-offset: 2px;
+}
+.add-btn:focus,
+.nav-btn:focus:not(:focus-visible) {
+  outline: none; /* hide for mouse click focus */
+}
+
+
+
