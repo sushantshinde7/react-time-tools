@@ -63,7 +63,7 @@ const Timer = () => {
   }, []);
 
   return (
-    <div className="timer-container">
+    <div className={`timer-container ${mode}`}>
       <nav className="timer-nav">
         {["pomodoro", "short", "long"].map((m) => (
           <div

@@ -1,100 +1,173 @@
+/* --- Timer Container --- */
 .timer-container {
   width: 340px;
   margin: 50px auto;
   background: #1e1e2f;
   color: #fff;
   border-radius: 18px;
-  padding: 0 0  25px; /* no top padding */
+  padding: 0 0 25px;
   text-align: center;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
   font-family: "Poppins", sans-serif;
-  overflow: hidden; /* ensures navbar blends perfectly with top edges */
+  overflow: hidden;
+  transition: 
+    box-shadow 0.6s ease,      /* smooth glow change */
+    background 0.6s ease,      /* container background smooth */
+    color 0.6s ease;
 }
 
-/* --- Top Navbar (Modes) --- */
+/* Accent glow + theme background */
+.timer-container.pomodoro {
+  box-shadow: 0 0 25px rgba(255, 99, 102, 0.35);
+}
+.timer-container.short {
+  box-shadow: 0 0 25px rgba(86, 171, 255, 0.35);
+}
+.timer-container.long {
+  box-shadow: 0 0 25px rgba(76, 175, 80, 0.35);
+}
+
+/* --- Navbar --- */
 .timer-nav {
   display: flex;
   justify-content: space-between;
-  background-color: #2c2c40;
   border-top-left-radius: 18px;
   border-top-right-radius: 18px;
-  margin: 0;               /* no outside margin */
-  padding: 0;              /* remove internal top gap */
-  margin-bottom: 28px;     /* space below the navbar only */
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 28px;
+  transition: background 0.6s ease; /* smooth gradient transition */
 }
 
+/* Navbar gradients per mode */
+.timer-container.pomodoro .timer-nav {
+  background: linear-gradient(135deg, #ff8787, #ff4d6d);
+}
+.timer-container.short .timer-nav {
+  background: linear-gradient(135deg, #7ecbff, #3d8eff);
+}
+.timer-container.long .timer-nav {
+  background: linear-gradient(135deg, #80e27e, #388e3c);
+}
+
+/* Navbar items */
 .nav-item {
   flex: 1;
-  padding: 10px 0;
+  padding: 12px 0;
   font-size: 14px;
-  color: #aaa;
+  color: rgba(255, 255, 255, 0.7);
   letter-spacing: 0.3px;
   cursor: pointer;
-  transition: background 0.3s ease, color 0.3s ease;
   user-select: none;
+  font-weight: 500;
+  transition: all 0.4s ease; /* smooth hover & color changes */
+  text-align: center;
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
+  font-weight: 600;
 }
 
+/* Active nav item */
 .nav-item.active {
-  background: linear-gradient(135deg, #ff6b6b, #ff4757);
   color: #fff;
-  font-weight: 500;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 -3px 0 rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+  border-radius: 8px;
+  transition: all 0.4s ease;
 }
 
 /* --- Time Display --- */
 .time-display {
   font-size: 64px;
-  font-weight: 600;
-  margin: 25px 0 30px;
-  letter-spacing: 1px;
+  font-weight: 700;
+  margin: 20px 0 30px;
+  letter-spacing: 1.5px;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+  transition: color 0.6s ease, text-shadow 0.6s ease; /* smooth tint change */
+}
+
+/* Mode subtle tint for time display */
+.timer-container.pomodoro .time-display {
+  text-shadow: 0 0 12px rgba(255, 99, 102, 0.35);
+}
+.timer-container.short .time-display {
+  text-shadow: 0 0 12px rgba(86, 171, 255, 0.35);
+}
+.timer-container.long .time-display {
+  text-shadow: 0 0 12px rgba(76, 175, 80, 0.35);
 }
 
 /* --- Controls --- */
 .timer-controls {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 14px;
+  margin-bottom: 10px;
 }
 
 .timer-controls button {
   border: none;
-  padding: 10px 20px;
+  padding: 10px 24px;
   border-radius: 12px;
   color: #fff;
   font-weight: 500;
   font-size: 15px;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
+  transition: all 0.4s ease; /* smooth hover & background transition */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
+/* Hover effect for buttons */
 .timer-controls button:hover {
   transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
-.start-btn {
-  background-color: #4caf50;
+/* Start button per mode */
+.timer-container.pomodoro .start-btn {
+  background: linear-gradient(135deg, #ff8787, #ff4d6d);
+}
+.timer-container.short .start-btn {
+  background: linear-gradient(135deg, #7ecbff, #3d8eff);
+}
+.timer-container.long .start-btn {
+  background: linear-gradient(135deg, #80e27e, #388e3c);
 }
 
+/* Pause & Reset buttons (muted tones) */
 .pause-btn {
-  background-color: #ff9800;
+  background: rgba(255, 200, 80, 0.85);
 }
-
 .reset-btn {
-  background-color: #f44336;
+  background: rgba(245, 130, 150, 0.85);
 }
 
 /* --- Responsive --- */
 @media (max-width: 400px) {
   .timer-container {
     width: 90%;
-    padding: 0 20px 20px;
+    padding: 20px;
   }
 
   .time-display {
     font-size: 50px;
   }
+
+  .nav-item {
+    font-size: 13px;
+    padding: 10px 0;
+  }
+
+  .timer-controls button {
+    padding: 8px 20px;
+    font-size: 14px;
+  }
 }
+
+
