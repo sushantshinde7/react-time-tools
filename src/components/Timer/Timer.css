@@ -35,7 +35,7 @@
   overflow: hidden;
   margin: 0;
   padding: 0;
-  margin-bottom: 28px;
+  margin-bottom: 0 ;
   transition: background 0.6s ease; /* smooth gradient transition */
 }
 
@@ -85,7 +85,7 @@
 .time-display {
   font-size: 64px;
   font-weight: 700;
-  margin: 20px 0 30px;
+  margin: 20px 0 0px;
   letter-spacing: 1.5px;
   color: #fff;
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
@@ -102,6 +102,53 @@
 .timer-container.long .time-display {
   text-shadow: 0 0 12px rgba(76, 175, 80, 0.35);
 }
+
+/* Full-width Linear Progress Bar Container */
+.progress-container-full {
+  width: 100%; /* spans full container */
+  height: 6px;
+  margin: 0; /* flush against navbar */
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Full-width Progress Bar */
+.progress-bar-full {
+  height: 100%;
+  width: 0%;
+  position: relative;
+  transition: width 0.3s linear;
+}
+
+/* Shimmer animation */
+.progress-bar-full .progress-shimmer-full {
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 40%;
+  height: 100%;
+  background: rgba(255,255,255,0.25);
+  transform: skewX(-20deg);
+  animation: shimmer-full 1.2s infinite;
+}
+
+@keyframes shimmer-full {
+  0% { left: -40%; }
+  100% { left: 100%; }
+}
+
+/* Mode Colors */
+.timer-container.pomodoro .progress-bar-full {
+  background: linear-gradient(90deg, #ff8787, #ff4d6d);
+}
+.timer-container.short .progress-bar-full {
+  background: linear-gradient(90deg, #7ecbff, #3d8eff);
+}
+.timer-container.long .progress-bar-full {
+  background: linear-gradient(90deg, #80e27e, #388e3c);
+}
+
 
 /* --- Controls --- */
 .timer-controls {
