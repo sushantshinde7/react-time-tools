@@ -63,7 +63,7 @@ const Timer = () => {
   }, []);
 
   return (
-    <div className="timer-container">
+    <div className={`timer-container ${mode}`}>
       <nav className="timer-nav">
         {["pomodoro", "short", "long"].map((m) => (
           <div
@@ -79,6 +79,18 @@ const Timer = () => {
           </div>
         ))}
       </nav>
+
+      {/* Full-width Linear Progress Bar under Navbar */}
+      <div className="progress-container-full">
+        <div
+          className="progress-bar-full"
+          style={{
+            width: `${((MODES[mode] - timeLeft) / MODES[mode]) * 100}%`,
+          }}
+        >
+          <div className="progress-shimmer-full"></div>
+        </div>
+      </div>
 
       <div className="time-display">{formatTime(timeLeft)}</div>
 
