@@ -1,4 +1,4 @@
-🕒 React Time Utilities
+🕒 React Time Utilities.
 
 A sleek, minimal React + Vite project that brings together multiple time-based utilities — Stopwatch, Alarm, Clock, and Timer — all in one clean interface.
 
