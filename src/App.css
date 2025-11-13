@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@600&display=swap");
+
 /* ======= APP LAYOUT ======= */
 .app-root {
   display: flex;
@@ -13,20 +15,57 @@
 
 /* ======= HEADER ======= */
 .app-title {
+  position: fixed;
+  top: 18px;
+  left: 22px;
+  font-family: "Pacifico", cursive;
   font-size: 26px;
-  font-weight: 600;
   color: #e60023;
-  margin-top: 24px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  user-select: none;
+  z-index: 10;
+  transition: letter-spacing 0.3s ease, text-shadow 0.3s ease;
 }
+
+
+/* underline */
+.app-title::after {
+  content: "";
+  display: block;
+  width: 125px;
+  height: 2px;
+  margin-top: 6px;
+  background: #e60023;
+  border-radius: 100px;
+  transform: skewX(-27deg);
+  opacity: 0.9;
+  transition: width 0.3s ease, opacity 0.3s ease;
+}
+
+.app-title:hover::after {
+  width: 135px;
+  opacity: 1;
+}
+
+
+@media (max-width: 480px) {
+  .app-title::after {
+    width: 90px;
+    margin-top: 4px;
+  }
+}
+
 
 /* ======= CONTENT AREA ======= */
 .tab-content {
   flex-grow: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* so content grows downward naturally */
   width: 100%;
+  overflow-y: auto; /* allow scroll when laps grow */
+  padding-top: 80px;
   animation: fadeIn 0.3s ease;
 }
 

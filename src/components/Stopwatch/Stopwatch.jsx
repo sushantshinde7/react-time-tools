@@ -1,11 +1,25 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import "./Stopwatch.css";
 
 function formatTime(ms) {
   const centiseconds = String(Math.floor((ms % 1000) / 10)).padStart(2, "0");
   const seconds = String(Math.floor((ms / 1000) % 60)).padStart(2, "0");
   const minutes = String(Math.floor((ms / 60000) % 60)).padStart(2, "0");
-  return `${minutes}:${seconds}.${centiseconds}`;
+  const hours = Math.floor(ms / 3600000);
+  return hours > 0
+    ? `${String(hours).padStart(2, "0")}:${minutes}:${seconds}.${centiseconds}`
+    : `${minutes}:${seconds}.${centiseconds}`;
+}
+
+/* --- clean, compact diff format --- */
+function formatLapDiff(ms) {
+  const totalSec = Math.floor(ms / 1000);
+  const min = Math.floor(totalSec / 60);
+  const sec = totalSec % 60;
+  const cs = Math.floor((ms % 1000) / 10);
+  return min > 0
+    ? `+${min}:${String(sec).padStart(2, "0")}.${String(cs).padStart(2, "0")}`
+    : `+${sec}.${String(cs).padStart(2, "0")}`;
 }
 
 export default function Stopwatch() {
@@ -13,6 +27,24 @@ export default function Stopwatch() {
   const [isRunning, setIsRunning] = useState(false);
   const [laps, setLaps] = useState([]);
   const interval = useRef(null);
+
+  /* ---------- Restore state ---------- */
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("stopwatch-state"));
+    if (saved) {
+      setTime(saved.time || 0);
+      setIsRunning(false); // never auto-run on load
+      setLaps(saved.laps || []);
+    }
+  }, []);
+
+  /* ---------- Persist state ---------- */
+  useEffect(() => {
+    localStorage.setItem(
+      "stopwatch-state",
+      JSON.stringify({ time, laps, isRunning })
+    );
+  }, [time, laps, isRunning]);
 
   const handleStart = () => {
     setIsRunning(true);
@@ -32,32 +64,47 @@ export default function Stopwatch() {
     setLaps([]);
     setIsRunning(false);
     clearInterval(interval.current);
+    localStorage.removeItem("stopwatch-state");
   };
 
   const handleLap = () => {
-    setLaps([time, ...laps]);
+    setLaps((prev) => [time, ...prev]);
   };
 
-  // continuous rotation
+  /* ---------- Keyboard Shortcuts ---------- */
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.code === "Space") {
+        e.preventDefault();
+        isRunning ? handlePause() : handleStart();
+      }
+      if (e.key.toLowerCase() === "l" && isRunning) handleLap();
+      if (e.key.toLowerCase() === "r" && !isRunning && time > 0) handleReset();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [isRunning, time]);
+
+  /* ---------- Visual rotation ---------- */
   const totalSeconds = time / 1000;
-  const degrees = (totalSeconds / 60) * 360; // continuous clockwise angle
-
-  // ticks logic for configurable number of ticks
-  const TICKS = 120; // change here to any N
+  const degrees = (totalSeconds / 60) * 360;
+  const TICKS = 120;
   const angleStep = 360 / TICKS;
-  const ticksPerSecond = TICKS / 60; // 2 when TICKS=120
+  const ticksPerSecond = TICKS / 60;
+  const secondsInMinute = totalSeconds % 60;
+  const ticksPassed = secondsInMinute * ticksPerSecond;
 
-  // how many ticks are considered "passed" within current minute (fractional)
-  const secondsInMinute = totalSeconds % 60; // 0..59.999
-  const ticksPassed = secondsInMinute * ticksPerSecond; // fractional
+  const tickRadius = 89;
+  const dotRadius = 83;
 
-  // visual radii (tweak as needed)
-  const tickRadius = 89; // distance used for ticks (matches your CSS translateY)
-  const dotRadius = 83;  // inner dot radius (matches your CSS translateY)
-  
+  /* ---------- Lap highlights ---------- */
+  const fastest =
+    laps.length > 1 ? Math.min(...laps.map((lap, i) => lap - (laps[i + 1] || 0))) : null;
+  const slowest =
+    laps.length > 1 ? Math.max(...laps.map((lap, i) => lap - (laps[i + 1] || 0))) : null;
+
   return (
     <div className="stopwatch-container">
-      
       <div className="stopwatch-wrapper">
         <div className="stopwatch-circle">
           {[...Array(TICKS)].map((_, i) => {
@@ -106,15 +153,26 @@ export default function Stopwatch() {
 
       {laps.length > 0 && (
         <div className="laps-list">
-          {laps.map((lap, idx) => (
-            <div className="lap-row" key={idx}>
-              <span>Lap {laps.length - idx}</span>
-              <span>{formatTime(lap)}</span>
-              <span>{idx === 0 ? "" : "+" + formatTime(lap - laps[idx - 1])}</span>
-            </div>
-          ))}
+          {laps.map((lap, idx) => {
+            const diff = lap - (laps[idx + 1] || 0);
+            const isFast = diff === fastest;
+            const isSlow = diff === slowest;
+            return (
+              <div
+                className={`lap-row fade-in ${isFast ? "fast" : ""} ${isSlow ? "slow" : ""}`}
+                key={idx}
+              >
+                <span>Lap {laps.length - idx}</span>
+                <span>{formatTime(lap)}</span>
+                <span>
+                  {idx === laps.length - 1 ? "" : formatLapDiff(diff)}
+                </span>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
+
