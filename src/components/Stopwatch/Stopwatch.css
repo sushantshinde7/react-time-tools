@@ -58,6 +58,7 @@
   border-radius: 50%;
   transform-origin: center center;
   box-shadow: 0 0 6px #ff0000;
+  transition: transform 0.1s linear;
 }
 
 /* ======= DISPLAY ======= */
@@ -119,15 +120,43 @@ button {
   margin-top: 14px;
   max-height: 140px;
   overflow-y: auto;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
+
 .lap-row {
   display: flex;
   justify-content: space-between;
   font-size: 15px;
   color: #333;
   padding: 6px 4px;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  opacity: 0.95;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
-.lap-row:last-child { border-bottom: none; }
+.lap-row:first-child {
+  border-top: none;
+}
+.lap-row.fast {
+  background: #d8ffd8;
+}
+.lap-row.slow {
+  background: #ffe1e1;
+}
+.lap-row.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- scroll shadow for laps --- */
+.laps-list::-webkit-scrollbar {
+  width: 6px;
+}
+.laps-list::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 4px;
+}
 
 
