@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./Alarm.css";
+import AlarmPopup from "./AlarmPopup";
 
 const Alarm = () => {
   const [alarms, setAlarms] = useState(() => {
@@ -8,7 +9,7 @@ const Alarm = () => {
   });
 
   const [editMode, setEditMode] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   const navRef = useRef(null);
 
@@ -17,7 +18,7 @@ const Alarm = () => {
     localStorage.setItem("alarms", JSON.stringify(alarms));
   }, [alarms]);
 
-  // Close edit when clicking outside navbar
+  // Close editMode if clicked outside nav
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (editMode && navRef.current && !navRef.current.contains(e.target)) {
@@ -45,32 +46,32 @@ const Alarm = () => {
 
         <h2 className="nav-title">Alarm</h2>
 
-        <button
-          className="nav-btn add-btn"
-          onClick={() => setShowTimePicker(true)}
-        >
+        <button className="nav-btn add-btn" onClick={() => setShowPopup(true)}>
           +
         </button>
       </div>
 
-      {/* Empty State */}
+      {/* Alarm List / Empty State */}
       <div className="alarm-list">
         {alarms.length === 0 ? (
           <p className="placeholder">No alarms added</p>
         ) : (
-          <div> {/* We will render alarms here later */} </div>
+          <div>{/* Alarm list items will come here */}</div>
         )}
       </div>
 
-      {/* Time Picker Popup (coming later) */}
-      {showTimePicker && (
-        <div className="picker-popup">
-          {/* Add your scroll-wheel time picker here */}
-        </div>
+      {/* ALARM POPUP */}
+      {showPopup && (
+        <AlarmPopup
+          onClose={() => setShowPopup(false)}
+          onSave={(newAlarm) => {
+            setAlarms((prev) => [...prev, newAlarm]);
+            setShowPopup(false);
+          }}
+        />
       )}
     </div>
   );
 };
 
 export default Alarm;
-
