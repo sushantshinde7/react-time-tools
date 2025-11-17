@@ -4,54 +4,61 @@
   align-items: center;
   position: relative;
   width: 100%;
-  height: 180px;
+  height: 116px; /* you said size is perfect — kept */
   gap: 12px;
   overflow: hidden;
 }
 
+/* each column */
 .tpw-column {
   height: 100%;
   width: 70px;
-  overflow-y: scroll;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: none;
-  scroll-snap-type: y mandatory;
   text-align: center;
-  padding-top: 66px;   /* push items so center aligns */
-  padding-bottom: 66px;
+  padding-top: 0;   /* we rely on spacer and repeated list now */
+  padding-bottom: 0;
 }
 
+/* hide native scrollbar */
 .tpw-column::-webkit-scrollbar {
   display: none;
 }
 
+/* item */
 .tpw-item {
-  height: 48px;
+  height: 48px;                 /* used in JS ITEM_HEIGHT */
   display: flex;
   justify-content: center;
   align-items: center;
-  scroll-snap-align: center;
   font-size: 1.4rem;
   opacity: 0.4;
-  transition: opacity 0.2s;
+  transition: opacity 0.12s;
+  user-select: none;
 }
 
+/* slightly emphasized center thanks to overlay; you can also enhance center item via JS if needed */
+/* small visual tweak: make items near center a bit stronger (optional) */
 .tpw-column .tpw-item:nth-child(n + 1) {
-  opacity: 0.4;
+  opacity: 0.6;
 }
 
-/* Highlight overlay */
+/* spacer to ensure center alignment */
+.tpw-spacer {
+  height: 48px;
+}
+
+/* Highlight overlay (center selection band) */
 .tpw-highlight {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   height: 48px;
   width: 100%;
-  border-top: 1px solid #9994;
-  border-bottom: 1px solid #9994;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
   pointer-events: none;
-}
-
-/* Make center item darker (visual effect) */
-.tpw-column {
-  scrollbar-width: none;
+  z-index: 2;
 }
