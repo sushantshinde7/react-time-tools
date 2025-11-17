@@ -1,0 +1,57 @@
+.tpw-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  height: 180px;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.tpw-column {
+  height: 100%;
+  width: 70px;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  scroll-snap-type: y mandatory;
+  text-align: center;
+  padding-top: 66px;   /* push items so center aligns */
+  padding-bottom: 66px;
+}
+
+.tpw-column::-webkit-scrollbar {
+  display: none;
+}
+
+.tpw-item {
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  scroll-snap-align: center;
+  font-size: 1.4rem;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+
+.tpw-column .tpw-item:nth-child(n + 1) {
+  opacity: 0.4;
+}
+
+/* Highlight overlay */
+.tpw-highlight {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 48px;
+  width: 100%;
+  border-top: 1px solid #9994;
+  border-bottom: 1px solid #9994;
+  pointer-events: none;
+}
+
+/* Make center item darker (visual effect) */
+.tpw-column {
+  scrollbar-width: none;
+}

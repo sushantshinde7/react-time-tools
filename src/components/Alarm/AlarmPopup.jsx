@@ -1,7 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import "./AlarmPopup.css";
+import TimePickerWheel from "./TimePickerWheel";
 
 const AlarmPopup = ({ onClose, onSave }) => {
+  const [alarmTime, setAlarmTime] = useState({
+    hour: 7,
+    minute: "00",
+    ampm: "AM",
+  });
+
   return (
     <div className="alarm-popup-overlay">
       <div className="alarm-popup">
@@ -10,7 +17,7 @@ const AlarmPopup = ({ onClose, onSave }) => {
         <div className="popup-header">
           <button className="popup-close" onClick={onClose}>×</button>
           <h3 className="popup-title">New Alarm</h3>
-          <button className="popup-save" onClick={onSave}>✓</button>
+          <button className="popup-save" onClick={() => onSave(alarmTime)}>✓</button>
         </div>
 
         {/* Scrollable body */}
@@ -19,9 +26,9 @@ const AlarmPopup = ({ onClose, onSave }) => {
           {/* Ring in text */}
           <p className="ring-time-text">Alarm will ring in 23h 52m</p>
 
-          {/* Time picker placeholder */}
-          <div className="timepicker-placeholder">
-            <p>Select Time</p>
+          {/* Time Picker Wheel */}
+          <div className="timepicker-wrapper">
+            <TimePickerWheel value={alarmTime} onChange={setAlarmTime} />
           </div>
 
           {/* Repeat Section */}
@@ -69,3 +76,4 @@ const AlarmPopup = ({ onClose, onSave }) => {
 };
 
 export default AlarmPopup;
+
