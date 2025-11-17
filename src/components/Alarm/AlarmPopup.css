@@ -1,0 +1,186 @@
+/* Overlay stays fixed inside alarm container */
+.alarm-popup-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 20;
+}
+
+/* Popup box = 70% height of parent container */
+.alarm-popup {
+  width: 100%;
+  height: 85%;
+  background: #ffffff;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+
+  /* Slide up animation */
+  animation: slideUp 0.25s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Header stays fixed (non-scrollable) */
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.popup-close,
+.popup-save {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #1e293b;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.popup-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Scrollable content */
+.popup-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px;
+}
+
+/* “Alarm will ring in” */
+.ring-time-text {
+  text-align: center;
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 14px;
+}
+
+/* Placeholder for time picker */
+.timepicker-placeholder {
+  height: 140px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Repeat buttons */
+.repeat-section {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.repeat-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  border-radius: 10px;
+  background: #f1f5f9;
+  font-size: 14px;
+  cursor: pointer;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.repeat-btn.active {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+/* Input fields */
+.input-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+
+.input-row label {
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 4px;
+}
+
+.text-input,
+.select-input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+}
+
+/* Toggle rows */
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 14px 0;
+}
+
+/* Switch styling */
+.switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  background: #cbd5e1;
+  border-radius: 20px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: 0.3s;
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+input:checked + .slider {
+  background: #2563eb;
+}
+
+input:checked + .slider:before {
+  transform: translateX(18px);
+}
