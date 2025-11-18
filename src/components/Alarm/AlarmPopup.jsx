@@ -3,32 +3,37 @@ import "./AlarmPopup.css";
 import TimePickerWheel from "./TimePickerWheel";
 
 const AlarmPopup = ({ onClose, onSave }) => {
-  const [alarmTime, setAlarmTime] = useState({
-    hour: 7,
-    minute: "00",
-    ampm: "AM",
-  });
+  const [alarmTime, setAlarmTime] = useState("07:00 AM");
+
+  const handleSave = () => {
+    onSave(alarmTime);
+  };
 
   return (
     <div className="alarm-popup-overlay">
       <div className="alarm-popup">
-
-        {/* Header (fixed) */}
+        {/* Header */}
         <div className="popup-header">
-          <button className="popup-close" onClick={onClose}>×</button>
+          <button className="popup-close" onClick={onClose}>
+            ×
+          </button>
           <h3 className="popup-title">New Alarm</h3>
-          <button className="popup-save" onClick={() => onSave(alarmTime)}>✓</button>
+          <button className="popup-save" onClick={handleSave}>
+            ✓
+          </button>
         </div>
 
         {/* Scrollable body */}
         <div className="popup-scroll">
-
-          {/* Ring in text */}
+          {/* Ring text */}
           <p className="ring-time-text">Alarm will ring in 23h 52m</p>
 
-          {/* Time Picker Wheel */}
+          {/* Inline Time Picker */}
           <div className="timepicker-wrapper">
-            <TimePickerWheel value={alarmTime} onChange={setAlarmTime} />
+            <TimePickerWheel
+              initialTime={alarmTime}
+              onTimeSelect={setAlarmTime}
+            />
           </div>
 
           {/* Repeat Section */}
@@ -68,12 +73,10 @@ const AlarmPopup = ({ onClose, onSave }) => {
               <span className="slider"></span>
             </label>
           </div>
-
-        </div> {/* /popup-scroll */}
+        </div>
       </div>
     </div>
   );
 };
 
 export default AlarmPopup;
-
