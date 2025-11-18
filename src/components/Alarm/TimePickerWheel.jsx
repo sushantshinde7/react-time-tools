@@ -1,188 +1,90 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState } from "react";
 import "./TimePickerWheel.css";
 
-export default function TimePickerWheel({ value, onChange }) {
-  const baseHours = Array.from({ length: 12 }, (_, i) => i + 1);
-  const baseMinutes = Array.from({ length: 60 }, (_, i) =>
-    i.toString().padStart(2, "0")
-  );
-  const baseMeridiem = ["AM", "PM"];
+export default function TimePickerWheel({ onTimeSelect, initialTime = "07:00 AM" }) {
+  const [hour, setHour] = useState(parseInt(initialTime.split(":")[0]));
+  const [minute, setMinute] = useState(parseInt(initialTime.split(":")[1]));
+  const [ampm, setAmPm] = useState(initialTime.includes("AM") ? "AM" : "PM");
 
-  // how many repetitions — enough to feel infinite but not too heavy
-  const REPEAT = 20;
+  const pad = (num) => String(num).padStart(2, "0");
 
-  const hours = buildRepeated(baseHours, REPEAT);
-  const minutes = buildRepeated(baseMinutes, REPEAT);
-  const meridiem = buildRepeated(baseMeridiem, REPEAT);
+  const handleTimeChange = (h, m, ap) => {
+    const timeStr = `${pad(h)}:${pad(m)} ${ap}`;
+    onTimeSelect && onTimeSelect(timeStr);
+  };
 
-  const hourRef = useRef(null);
-  const minuteRef = useRef(null);
-  const meridiemRef = useRef(null);
-  const scrollTimeout = useRef({});
+  const incrementHour = () => {
+    const newHour = hour === 12 ? 1 : hour + 1;
+    setHour(newHour);
+    handleTimeChange(newHour, minute, ampm);
+  };
 
-  const ITEM_HEIGHT = 48; // must match CSS .tpw-item height
+  const decrementHour = () => {
+    const newHour = hour === 1 ? 12 : hour - 1;
+    setHour(newHour);
+    handleTimeChange(newHour, minute, ampm);
+  };
 
-  // Build repeated flat array
-  function buildRepeated(list, times) {
-    const out = new Array(list.length * times);
-    for (let i = 0; i < times; i++) {
-      for (let j = 0; j < list.length; j++) {
-        out[i * list.length + j] = list[j];
-      }
+  const incrementMinute = () => {
+    let newMinute = minute + 1;
+    let newHour = hour;
+    let newAmPm = ampm;
+    if (newMinute === 60) {
+      newMinute = 0;
+      newHour = hour === 12 ? 1 : hour + 1;
+      if (newHour === 12) newAmPm = ampm === "AM" ? "PM" : "AM";
     }
-    return out;
-  }
+    setMinute(newMinute);
+    setHour(newHour);
+    setAmPm(newAmPm);
+    handleTimeChange(newHour, newMinute, newAmPm);
+  };
 
-  // Map a long-array index to base array value
-  function mapIndexToValue(index, baseList) {
-    const len = baseList.length;
-    // positive modulo
-    const mod = ((index % len) + len) % len;
-    return baseList[mod];
-  }
-
-  // Snap handler: given ref and its base list, snap to nearest item and notify parent
-  function snapToMiddle(ref, baseList, onKey) {
-    if (!ref.current) return;
-    const scrollTop = ref.current.scrollTop;
-    const index = Math.round(scrollTop / ITEM_HEIGHT);
-
-    // get real value using modulo
-    const realValue = mapIndexToValue(index, baseList);
-
-    // report to parent
-    onChange({
-      ...value,
-      [onKey]: realValue,
-    });
-
-    // smoothly re-center to exact item position
-    ref.current.scrollTo({
-      top: index * ITEM_HEIGHT,
-      behavior: "auto",
-    });
-  }
-
-  // When component mounts, center each column on the repeated block that contains current value
-  useEffect(() => {
-    // helper to compute start index
-    const centerBlock = Math.floor(REPEAT / 2) * baseHours.length;
-
-    // compute index for hour
-    const hourIndexInBase =
-      baseHours.indexOf(Number(value.hour)) !== -1
-        ? baseHours.indexOf(Number(value.hour))
-        : 0;
-    const minuteIndexInBase =
-      baseMinutes.indexOf(String(value.minute).padStart(2, "0")) !== -1
-        ? baseMinutes.indexOf(String(value.minute).padStart(2, "0"))
-        : 0;
-    const merIndexInBase =
-      baseMeridiem.indexOf(value.ampm) !== -1
-        ? baseMeridiem.indexOf(value.ampm)
-        : 0;
-
-    // scroll to middle repetition + base index (plus one spacer already in DOM)
-    if (hourRef.current) {
-      hourRef.current.scrollTop = (centerBlock + hourIndexInBase) * ITEM_HEIGHT;
+  const decrementMinute = () => {
+    let newMinute = minute - 1;
+    let newHour = hour;
+    let newAmPm = ampm;
+    if (newMinute === -1) {
+      newMinute = 59;
+      newHour = hour === 1 ? 12 : hour - 1;
+      if (newHour === 11) newAmPm = ampm === "AM" ? "PM" : "AM";
     }
-    if (minuteRef.current) {
-      // for minutes centerBlock must use baseMinutes length
-      const centerBlockMin = Math.floor(REPEAT / 2) * baseMinutes.length;
-      minuteRef.current.scrollTop =
-        (centerBlockMin + minuteIndexInBase) * ITEM_HEIGHT;
-    }
-    if (meridiemRef.current) {
-      const centerBlockMer = Math.floor(REPEAT / 2) * baseMeridiem.length;
-      meridiemRef.current.scrollTop =
-        (centerBlockMer + merIndexInBase) * ITEM_HEIGHT;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // run once on mount
+    setMinute(newMinute);
+    setHour(newHour);
+    setAmPm(newAmPm);
+    handleTimeChange(newHour, newMinute, newAmPm);
+  };
 
-  // Small throttle: only trigger snap after user stops scrolling.
-  // We'll use onScroll with a debounce via requestAnimationFrame and setTimeout.
-  // Keep one timer per column:
-  const timers = useRef({ h: null, m: null, p: null });
-  const slowScroll = (ref) => {
-  if (!ref.current) return;
-
-  ref.current.style.scrollBehavior = "auto"; // free scroll
-  clearTimeout(ref.current.snapTimeout);
-
-  ref.current.snapTimeout = setTimeout(() => {
-    ref.current.style.scrollBehavior = "smooth"; // smooth snap
-  }, 150);
-};
-
-  const handleScroll = (ref, list, key) => {
-    if (!ref.current) return;
-
-    clearTimeout(scrollTimeout.current[key]);
-
-    scrollTimeout.current[key] = setTimeout(() => {
-      snapToMiddle(ref, list, key);
-    }, 120); // slow down snapping
+  const toggleAmPm = () => {
+    const newAmPm = ampm === "AM" ? "PM" : "AM";
+    setAmPm(newAmPm);
+    handleTimeChange(hour, minute, newAmPm);
   };
 
   return (
-  <div className="tpw-wrapper">
-    <div className="tpw-highlight" />
+    <div className="spinner-timepicker">
+      {/* Hours */}
+      <div className="spinner-column">
+        <button className="arrow-btn" onClick={incrementHour}>▲</button>
+        <div className="spinner-value">{pad(hour)}</div>
+        <button className="arrow-btn" onClick={decrementHour}>▼</button>
+      </div>
 
-    {/* HOURS */}
-    <div
-      className="tpw-column"
-      ref={hourRef}
-      onScroll={() => {
-        slowScroll(hourRef);
-        handleScroll(hourRef, hours, "hour");
-      }}
-    >
-      <div className="tpw-spacer" />
-      {hours.map((h, i) => (
-        <div key={`h-${i}`} className="tpw-item">
-          {h}
-        </div>
-      ))}
-      <div className="tpw-spacer" />
+      <div className="spinner-col-separator">:</div>
+
+      {/* Minutes */}
+      <div className="spinner-column">
+        <button className="arrow-btn" onClick={incrementMinute}>▲</button>
+        <div className="spinner-value">{pad(minute)}</div>
+        <button className="arrow-btn" onClick={decrementMinute}>▼</button>
+      </div>
+
+      {/* AM/PM */}
+      <div className="spinner-column">
+        <button className="arrow-btn" onClick={toggleAmPm}>▲</button>
+        <div className="spinner-value">{ampm}</div>
+        <button className="arrow-btn" onClick={toggleAmPm}>▼</button>
+      </div>
     </div>
-
-    {/* MINUTES */}
-    <div
-      className="tpw-column"
-      ref={minuteRef}
-      onScroll={() => {
-        slowScroll(minuteRef);
-        handleScroll(minuteRef, minutes, "minute");
-      }}
-    >
-      <div className="tpw-spacer" />
-      {minutes.map((m, i) => (
-        <div key={`m-${i}`} className="tpw-item">
-          {m}
-        </div>
-      ))}
-      <div className="tpw-spacer" />
-    </div>
-
-    {/* AM/PM */}
-    <div
-      className="tpw-column"
-      ref={meridiemRef}
-      onScroll={() => {
-        slowScroll(meridiemRef);
-        handleScroll(meridiemRef, meridiem, "ampm");
-      }}
-    >
-      <div className="tpw-spacer" />
-      {meridiem.map((ap, i) => (
-        <div key={`p-${i}`} className="tpw-item">
-          {ap}
-        </div>
-      ))}
-      <div className="tpw-spacer" />
-    </div>
-  </div>
-);
-
+  );
 }
