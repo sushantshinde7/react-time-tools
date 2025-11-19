@@ -32,7 +32,6 @@ const Alarm = () => {
 
   return (
     <div className="alarm-container">
-
       {/* Navbar */}
       <div className="alarm-nav" ref={navRef}>
         <button
@@ -51,11 +50,12 @@ const Alarm = () => {
 
       {/* Alarm List / Empty State */}
       <div className="alarm-list">
-        {alarms.length === 0 ? (
-          <p className="placeholder">No alarms added</p>
-        ) : (
-          <div className="alarm-items">{/* Todo: render alarm items later */}</div>
-        )}
+        <p className="alarm-list-placeholder">
+          <span role="img" aria-label="alarm">
+            ⏰
+          </span>{" "}
+          No alarms added
+        </p>
       </div>
 
       {/* Alarm Popup */}
@@ -73,4 +73,3 @@ const Alarm = () => {
 };
 
 export default Alarm;
-
