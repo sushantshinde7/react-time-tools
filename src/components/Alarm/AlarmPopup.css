@@ -1,50 +1,39 @@
-/* Overlay stays fixed inside alarm container */
+/* Overlay */
 .alarm-popup-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
   display: flex;
   justify-content: center;
   align-items: flex-end;
   z-index: 20;
 }
 
-/* Popup box = 70% height of parent container */
+/* Popup container */
 .alarm-popup {
   width: 100%;
   height: 83%;
-  background: #ffffff;
-  border-radius: 10px 10px 0 0;
-  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+  background: #f9fafb;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
-
-  /* Slide up animation */
   animation: slideUp 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-    opacity: 0.3;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-/* Header stays fixed (non-scrollable) */
+/* Header */
 .popup-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 2px 10px;
   border-bottom: 1px solid #e2e8f0;
+  background: #e0f2fe;
+  border-radius: 16px 16px 0 0;
   flex-shrink: 0;
 }
 
@@ -60,8 +49,8 @@
 
 .popup-title {
   font-size: 18px;
-  font-weight: 600;
-  color: #1e293b;
+  font-weight: 700;
+  color: #1e40af;
 }
 
 /* Scrollable content */
@@ -72,28 +61,38 @@
   scroll-padding-bottom: 40px;
   scrollbar-width: none;/* Hide scrollbar */
 }
+
 .popup-scroll::-webkit-scrollbar {
   display: none;
 }
-/* “Alarm will ring in” */
+
+/* Ring time */
 .ring-time-text {
   text-align: center;
   font-size: 16px;
   color: #475569;
   margin-bottom: 8px;
 }
-.timepicker-wrapper {
-  display: flex;
-  justify-content: center;
-  margin: 10px 0 ;
-  padding: 10px 0;
+
+/* Section cards */
+.popup-section {
+  background: #ffffff;
+  padding: 12px 14px;
+  border-radius: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.popup-section h4 {
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 6px;
 }
 
 /* Repeat buttons */
 .repeat-section {
   display: flex;
   gap: 10px;
-  margin-bottom: 16px;
 }
 
 .repeat-btn {
@@ -114,34 +113,38 @@
 }
 
 /* Input fields */
-.input-row {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 16px;
-}
-
-.input-row label {
-  font-size: 14px;
-  color: #475569;
-  margin-bottom: 4px;
-}
-
 .text-input,
 .select-input {
-  background: #e2e2e2 !important;
-  color: #1e293b;
+  width: 100%;
   padding: 10px;
   border-radius: 8px;
   border: 1px solid #cbd5e1;
   font-size: 14px;
+  background: #fefefe;
+  color: #1e293b;
+}
+
+.time-stepper-wrapper {
+  display: flex;             /* flex container */
+  justify-content: center;   /* center horizontally */
+  align-items: center;       /* optional: center vertically */
+  width: 100%;               /* take full width of section */
+  margin-bottom: 12px;
 }
 
 /* Toggle rows */
+.toggle-wrapper {
+  background: #fff;
+  padding: 12px 14px;
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
 .toggle-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 16px 0;
+  margin-bottom: 12px;
 }
 
 /* Switch styling */
@@ -164,7 +167,6 @@
   transition: 0.25s;
 }
 
-
 .slider::before {
   content: "";
   position: absolute;
@@ -184,4 +186,10 @@ input:checked + .slider {
 
 input:checked + .slider:before {
   transform: translateX(20px);
+}
+
+/* Slide up animation */
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0.3; }
+  to { transform: translateY(0); opacity: 1; }
 }

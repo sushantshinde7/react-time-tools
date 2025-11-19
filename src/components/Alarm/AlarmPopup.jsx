@@ -6,7 +6,7 @@ const AlarmPopup = ({ onClose, onSave }) => {
   const [alarmTime, setAlarmTime] = useState("07:00 AM");
 
   const handleSave = () => {
-    onSave(alarmTime);
+    onSave(alarmTime); // Todo: later include full alarm object
   };
 
   return (
@@ -25,53 +25,57 @@ const AlarmPopup = ({ onClose, onSave }) => {
 
         {/* Scrollable body */}
         <div className="popup-scroll">
-          {/* Ring text */}
+          {/* Ring time */}
           <p className="ring-time-text">Alarm will ring in 23h 52m</p>
 
-          {/* Inline Time Picker */}
-          <div className="timepicker-wrapper">
-            <TimeStepper
-              initialTime={alarmTime}
-              onTimeSelect={setAlarmTime}
-            />
+          {/* Section: TimeStepper */}
+            <h4>Time</h4>
+            <div className="time-stepper-wrapper">
+              <TimeStepper
+                initialTime={alarmTime}
+                onTimeSelect={setAlarmTime}
+              />
+            </div>
+
+          {/* Section: Repeat */}
+          <div className="popup-section">
+            <h4>Repeat</h4>
+            <div className="repeat-section">
+              <button className="repeat-btn active">Ring Once</button>
+              <button className="repeat-btn">Custom ▼</button>
+            </div>
           </div>
 
-          {/* Repeat Section */}
-          <div className="repeat-section">
-            <button className="repeat-btn active">Ring Once</button>
-            <button className="repeat-btn">Custom ▼</button>
-          </div>
-
-          {/* Alarm Name */}
-          <div className="input-row">
-            <label>Alarm Name</label>
+          {/* Section: Alarm Name */}
+          <div className="popup-section">
+            <h4>Alarm Name</h4>
             <input type="text" className="text-input" placeholder="Optional" />
           </div>
 
-          {/* Ringtone */}
-          <div className="input-row">
-            <label>Ringtone</label>
+          {/* Section: Ringtone */}
+          <div className="popup-section">
+            <h4>Ringtone</h4>
             <select className="select-input">
               <option>Default</option>
             </select>
           </div>
 
-          {/* Vibrate */}
-          <div className="toggle-row">
-            <span>Vibrate</span>
-            <label className="switch">
-              <input type="checkbox" defaultChecked />
-              <span className="slider"></span>
-            </label>
-          </div>
-
-          {/* Snooze */}
-          <div className="toggle-row">
-            <span>Snooze</span>
-            <label className="switch">
-              <input type="checkbox" defaultChecked />
-              <span className="slider"></span>
-            </label>
+          {/* Section: Toggles */}
+          <div className="popup-section toggle-wrapper">
+            <div className="toggle-row">
+              <span>Vibrate</span>
+              <label className="switch">
+                <input type="checkbox" defaultChecked />
+                <span className="slider"></span>
+              </label>
+            </div>
+            <div className="toggle-row">
+              <span>Snooze</span>
+              <label className="switch">
+                <input type="checkbox" defaultChecked />
+                <span className="slider"></span>
+              </label>
+            </div>
           </div>
         </div>
       </div>

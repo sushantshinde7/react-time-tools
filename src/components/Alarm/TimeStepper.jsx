@@ -63,84 +63,92 @@ export default function TimeStepper({
     setAmPm(newAmPm);
     handleTimeChange(hour, minute, newAmPm);
   };
-  
+
   return (
-  <div
-    className="time-stepper"
-    tabIndex={0}
-    onKeyDown={(e) => {
-      if (["ArrowUp", "ArrowDown"].includes(e.key)) {
-        e.preventDefault(); // stop popup scroll on key press
-      }
-    }}
-  >
-
-    {/* HOURS */}
     <div
-      className="time-col"
+      className="time-stepper"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === "ArrowUp") { e.preventDefault(); incrementHour(); }
-        if (e.key === "ArrowDown") { e.preventDefault(); decrementHour(); }
-      }}
-    >
-      <button className="arrow-btn" onClick={incrementHour}>
-        <span className="arrow-up"></span>
-      </button>
-
-      <div className="time-value">{pad(hour)}</div>
-
-      <button className="arrow-btn" onClick={decrementHour}>
-        <span className="arrow-down"></span>
-      </button>
-    </div>
-
-    <div className="time-separator">:</div>
-
-    {/* MINUTES */}
-    <div
-      className="time-col"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "ArrowUp") { e.preventDefault(); incrementMinute(); }
-        if (e.key === "ArrowDown") { e.preventDefault(); decrementMinute(); }
-      }}
-    >
-      <button className="arrow-btn" onClick={incrementMinute}>
-        <span className="arrow-up"></span>
-      </button>
-
-      <div className="time-value">{pad(minute)}</div>
-
-      <button className="arrow-btn" onClick={decrementMinute}>
-        <span className="arrow-down"></span>
-      </button>
-    </div>
-
-    {/* AM / PM */}
-    <div
-      className="time-col"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-          e.preventDefault();
-          toggleAmPm();
+        if (["ArrowUp", "ArrowDown"].includes(e.key)) {
+          e.preventDefault(); // stop popup scroll on key press
         }
       }}
     >
-      <button className="arrow-btn" onClick={toggleAmPm}>
-        <span className="arrow-up"></span>
-      </button>
+      {/* HOURS */}
+      <div
+        className="time-col"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowUp") {
+            e.preventDefault();
+            incrementHour();
+          }
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            decrementHour();
+          }
+        }}
+      >
+        <button className="arrow-btn" onClick={incrementHour}>
+          <span className="arrow-up"></span>
+        </button>
 
-      <div className="time-value">{ampm}</div>
+        <div className="time-value">{pad(hour)}</div>
 
-      <button className="arrow-btn" onClick={toggleAmPm}>
-        <span className="arrow-down"></span>
-      </button>
+        <button className="arrow-btn" onClick={decrementHour}>
+          <span className="arrow-down"></span>
+        </button>
+      </div>
+
+      <div className="time-separator">:</div>
+
+      {/* MINUTES */}
+      <div
+        className="time-col"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowUp") {
+            e.preventDefault();
+            incrementMinute();
+          }
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            decrementMinute();
+          }
+        }}
+      >
+        <button className="arrow-btn" onClick={incrementMinute}>
+          <span className="arrow-up"></span>
+        </button>
+
+        <div className="time-value">{pad(minute)}</div>
+
+        <button className="arrow-btn" onClick={decrementMinute}>
+          <span className="arrow-down"></span>
+        </button>
+      </div>
+
+      {/* AM / PM */}
+      <div
+        className="time-col"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+            e.preventDefault();
+            toggleAmPm();
+          }
+        }}
+      >
+        <button className="arrow-btn" onClick={toggleAmPm}>
+          <span className="arrow-up"></span>
+        </button>
+
+        <div className="time-value">{ampm}</div>
+
+        <button className="arrow-btn" onClick={toggleAmPm}>
+          <span className="arrow-down"></span>
+        </button>
+      </div>
     </div>
-
-  </div>
-);
-
-
+  );
 }
