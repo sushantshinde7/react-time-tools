@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./AlarmPopup.css";
-import TimePickerWheel from "./TimePickerWheel";
+import TimeStepper from "./TimeStepper";
 
 const AlarmPopup = ({ onClose, onSave }) => {
   const [alarmTime, setAlarmTime] = useState("07:00 AM");
@@ -30,7 +30,7 @@ const AlarmPopup = ({ onClose, onSave }) => {
 
           {/* Inline Time Picker */}
           <div className="timepicker-wrapper">
-            <TimePickerWheel
+            <TimeStepper
               initialTime={alarmTime}
               onTimeSelect={setAlarmTime}
             />
