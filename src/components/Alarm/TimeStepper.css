@@ -1,0 +1,110 @@
+/* Parent container */
+.time-stepper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  max-width: 220px;
+}
+
+/* Column wrapper */
+.time-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.time-col:focus {
+  outline: none;
+  background: rgba(0, 122, 255, 0.12); /* soft blue highlight */
+  border-radius: 6px;
+  box-shadow: 0 0 6px rgba(0, 122, 255, 0.5);
+}
+
+
+/* Value box */
+.time-value {
+  font-size: 20px;
+  font-weight: 600;
+  width: 42px;
+  padding: 5px 0;
+  margin: 3px 0;
+  text-align: center;
+  background: #f5f7fa;
+  color: #1565c0;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* --------------------------------------- */
+/*  PERFECT SYMMETRICAL TRIANGLE ARROWS    */
+/* --------------------------------------- */
+
+/* Button box */
+.arrow-btn {
+  width: 42px;
+  height: 28px;
+  background: #eef5fb;        /* soft light bg */
+  border: 1px solid #c7d7e8;  /* subtle border */
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+/* Up arrow (push it DOWN inside button) */
+.arrow-up {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 9px solid #0d47a1;
+  margin-top: 8px;   /* pushes triangle DOWN */
+}
+
+/* Down arrow (push it UP inside button) */
+.arrow-down {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 9px solid #0d47a1;
+  margin-bottom: 8px;  /* pushes triangle UP */
+}
+
+
+/* Hover + active */
+.arrow-btn:hover {
+  background: #e3edf8;
+}
+
+.arrow-btn:active {
+  transform: scale(0.92);
+  background: #dce8f6;
+}
+
+/* Hover animation */
+
+/* UP arrow → move DOWN */
+.arrow-btn:hover .arrow-up {
+  opacity: 0.9;
+  transform: translateY(1px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+/* DOWN arrow → move UP */
+.arrow-btn:hover .arrow-down {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+/* Colon separator */
+.time-separator {
+  font-size: 20px;
+  font-weight: 600;
+  color: #444;
+}
