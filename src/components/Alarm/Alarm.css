@@ -73,23 +73,24 @@
   color: #1e40af;
 }
 
-/* Alarm list container */
 .alarm-list {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;       /* center horizontally */
+  justify-content: center;   /* center vertically */
   padding: 10px;
-  flex-grow: 1;
-  overflow-y: auto;
+  flex: 1 1 auto;            /* correct flex shorthand */
+  min-height: 10px;
+  border: 1px solid blue;
 }
 
-/* Empty placeholder */
-.placeholder {
-  color: #7286a1;
-  text-align: center;
-  margin-top: 50px;
+.alarm-list-placeholder {
   font-size: 15px;
+  color: #ee0707;  /* red test color */
+  text-align: center;
+  font-weight: 500;
 }
+
 
 /* Future alarm item cards (distinct style) */
 .alarm-item {
