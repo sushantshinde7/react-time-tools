@@ -26,9 +26,7 @@ const Alarm = () => {
       }
     };
 
-    if (editMode) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    if (editMode) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [editMode]);
 
@@ -56,11 +54,11 @@ const Alarm = () => {
         {alarms.length === 0 ? (
           <p className="placeholder">No alarms added</p>
         ) : (
-          <div>{/* Alarm list items will come here */}</div>
+          <div className="alarm-items">{/* Todo: render alarm items later */}</div>
         )}
       </div>
 
-      {/* ALARM POPUP */}
+      {/* Alarm Popup */}
       {showPopup && (
         <AlarmPopup
           onClose={() => setShowPopup(false)}
@@ -75,3 +73,4 @@ const Alarm = () => {
 };
 
 export default Alarm;
+
