@@ -3,7 +3,18 @@ import "./AlarmPopup.css";
 import TimeStepper from "./TimeStepper";
 
 const AlarmPopup = ({ onClose, onSave }) => {
-  const [alarmTime, setAlarmTime] = useState("07:00 AM");
+  const getCurrentTime = () => {
+  const now = new Date();
+  let h = now.getHours();
+  const m = now.getMinutes();
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12; // convert 0 → 12
+
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")} ${ampm}`;
+};
+
+const [alarmTime, setAlarmTime] = useState(getCurrentTime());
+
 
   const handleSave = () => {
     onSave(alarmTime); // Todo: later include full alarm object
