@@ -3,9 +3,18 @@ import "./Alarm.css";
 import AlarmPopup from "./AlarmPopup";
 
 const Alarm = () => {
+  // ----------------------------------------
+  // SAFE LOCALSTORAGE INITIALIZATION
+  // ----------------------------------------
   const [alarms, setAlarms] = useState(() => {
-    const saved = localStorage.getItem("alarms");
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem("alarms");
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      console.warn("Failed to parse alarms from localStorage", e);
+      return [];
+    }
   });
 
   const [editMode, setEditMode] = useState(false);
@@ -13,12 +22,16 @@ const Alarm = () => {
 
   const navRef = useRef(null);
 
-  // Save alarms to localStorage
+  // ----------------------------------------
+  // SAVE TO LOCALSTORAGE ON EVERY UPDATE
+  // ----------------------------------------
   useEffect(() => {
     localStorage.setItem("alarms", JSON.stringify(alarms));
   }, [alarms]);
 
-  // Close editMode if clicked outside nav
+  // ----------------------------------------
+  // CLOSE EDIT MODE ON CLICK OUTSIDE NAVBAR
+  // ----------------------------------------
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (editMode && navRef.current && !navRef.current.contains(e.target)) {
@@ -32,7 +45,9 @@ const Alarm = () => {
 
   return (
     <div className="alarm-container">
-      {/* Navbar */}
+      {/* ----------------------------------------
+          TOP NAVBAR
+      ----------------------------------------- */}
       <div className="alarm-nav" ref={navRef}>
         <button
           className={`nav-btn ${editMode ? "active" : ""}`}
@@ -48,7 +63,9 @@ const Alarm = () => {
         </button>
       </div>
 
-      {/* Alarm List / Empty State */}
+      {/* ----------------------------------------
+          ALARM LIST (TEMP: PLACEHOLDER ALWAYS SHOWN)
+      ----------------------------------------- */}
       <div className="alarm-list">
         <p className="alarm-list-placeholder">
           <span role="img" aria-label="alarm">
@@ -56,14 +73,20 @@ const Alarm = () => {
           </span>{" "}
           No alarms added
         </p>
+
+        {/* Later: dynamic alarms will replace above placeholder */}
       </div>
 
-      {/* Alarm Popup */}
+      {/* ----------------------------------------
+          POPUP FOR ADDING ALARMS
+      ----------------------------------------- */}
       {showPopup && (
         <AlarmPopup
           onClose={() => setShowPopup(false)}
           onSave={(newAlarm) => {
+            // TEMP setup: store what popup gives (string for now)
             setAlarms((prev) => [...prev, newAlarm]);
+
             setShowPopup(false);
           }}
         />
