@@ -99,11 +99,10 @@ const AlarmPopup = ({ onClose, onSave }) => {
       {/* Scrollable body */}
       <div className="popup-scroll">
         <p className="ring-time-text">
-          Alarm will ring in {remainingTime || "–"}
+          Alarm will ring in <span>{remainingTime || "–"}</span>
         </p>
 
         {/* Time */}
-        <h4>Time</h4>
         <div className="time-stepper-wrapper">
           <TimeStepper initialTime={alarmTime} onTimeSelect={setAlarmTime} />
         </div>
