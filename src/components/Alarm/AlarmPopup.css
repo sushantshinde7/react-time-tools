@@ -17,7 +17,7 @@
 /* Popup container */
 .alarm-popup {
   width: 100%;
-  height: 83%;
+  height: 85%;
   background: #f9fafb;
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.15);
@@ -81,16 +81,21 @@
 /* Ring time */
 .ring-time-text {
   text-align: center;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
   color: #475569;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
+  letter-spacing: 0.3px;
+  font-family: "Poppins", sans-serif;
+}
+.ring-time-text span {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Section cards */
 .popup-section {
   background: #ffffff;
-  padding: 14px 16px;
+  padding: 8px 16px;
   border-radius: 16px;
   margin-bottom: 14px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -103,10 +108,13 @@
 }
 
 .popup-section h4 {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
   color: #475569;
   margin-bottom: 8px;
+  font-family: "Inter", "Poppins", sans-serif;
+  text-transform: uppercase;
 }
 
 /* Repeat buttons */
@@ -117,7 +125,7 @@
 
 .repeat-btn {
   flex: 1;
-  padding: 10px 0;
+  padding: 9px 0;
   border: none;
   border-radius: 12px;
   background: #f1f5f9;
@@ -171,10 +179,10 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   padding: 10px 0;
   background: #e8f0fe;
-  border-radius: 16px;
+  border-radius: 14px;
   box-shadow: inset 0 2px 6px rgba(37, 99, 235, 0.08);
 }
 
