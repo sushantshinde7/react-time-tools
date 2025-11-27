@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./Alarm.css";
 import AlarmPopup from "./AlarmPopup";
+import AlarmItem from "./AlarmItem";
 
 const Alarm = () => {
   // ----------------------------------------
@@ -11,27 +12,21 @@ const Alarm = () => {
       const saved = localStorage.getItem("alarms");
       const parsed = saved ? JSON.parse(saved) : [];
       return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-      console.warn("Failed to parse alarms from localStorage", e);
+    } catch {
       return [];
     }
   });
 
   const [editMode, setEditMode] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-
   const navRef = useRef(null);
 
-  // ----------------------------------------
-  // SAVE TO LOCALSTORAGE ON EVERY UPDATE
-  // ----------------------------------------
+  // SAVE ON EVERY CHANGE
   useEffect(() => {
     localStorage.setItem("alarms", JSON.stringify(alarms));
   }, [alarms]);
 
-  // ----------------------------------------
-  // CLOSE EDIT MODE ON CLICK OUTSIDE NAVBAR
-  // ----------------------------------------
+  // CLOSE EDIT MODE IF CLICK OUTSIDE
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (editMode && navRef.current && !navRef.current.contains(e.target)) {
@@ -56,6 +51,18 @@ const Alarm = () => {
           {editMode ? "Done" : "Edit"}
         </button>
 
+        {editMode && (
+          <button
+            className="nav-btn danger-btn"
+            onClick={() => {
+              setAlarms([]);
+              localStorage.removeItem("alarms");
+            }}
+          >
+            Clear All
+          </button>
+        )}
+
         <h2 className="nav-title">Alarm</h2>
 
         <button className="nav-btn add-btn" onClick={() => setShowPopup(true)}>
@@ -64,29 +71,39 @@ const Alarm = () => {
       </div>
 
       {/* ----------------------------------------
-          ALARM LIST (TEMP: PLACEHOLDER ALWAYS SHOWN)
+          ALARM LIST
       ----------------------------------------- */}
       <div className="alarm-list">
-        <p className="alarm-list-placeholder">
-          <span role="img" aria-label="alarm">
-            ⏰
-          </span>{" "}
-          No alarms added
-        </p>
-
-        {/* Later: dynamic alarms will replace above placeholder */}
+        {alarms.length === 0 ? (
+          <p className="alarm-list-placeholder">
+            ⏰ No alarms added
+          </p>
+        ) : (
+          alarms.map((alarm) => (
+            <div className="alarm-card" key={alarm.id}>
+              <AlarmItem
+                alarm={alarm}
+                onToggle={(id) =>
+                  setAlarms((prev) =>
+                    prev.map((a) =>
+                      a.id === id ? { ...a, isOn: !a.isOn } : a
+                    )
+                  )
+                }
+              />
+            </div>
+          ))
+        )}
       </div>
 
       {/* ----------------------------------------
-          POPUP FOR ADDING ALARMS
+          POPUP
       ----------------------------------------- */}
       {showPopup && (
         <AlarmPopup
           onClose={() => setShowPopup(false)}
           onSave={(newAlarm) => {
-            // TEMP setup: store what popup gives (string for now)
             setAlarms((prev) => [...prev, newAlarm]);
-
             setShowPopup(false);
           }}
         />

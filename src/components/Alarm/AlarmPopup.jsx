@@ -64,7 +64,6 @@ const AlarmPopup = ({ onClose, onSave }) => {
   }, [alarmTime]);
   // ---------------------------
 
-
   const handleSave = () => {
     const newAlarm = {
       id: Date.now(),
@@ -83,116 +82,121 @@ const AlarmPopup = ({ onClose, onSave }) => {
   };
 
   return (
-  <div className="alarm-popup-overlay">
-    <div className="alarm-popup">
-      {/* Header */}
-      <div className="popup-header">
-        <button className="popup-close" onClick={onClose}>
-          ×
-        </button>
-        <h3 className="popup-title">New Alarm</h3>
-        <button className="popup-save" onClick={handleSave}>
-          ✓
-        </button>
-      </div>
-
-      {/* Scrollable body */}
-      <div className="popup-scroll">
-        <p className="ring-time-text">
-          Alarm will ring in <span>{remainingTime || "–"}</span>
-        </p>
-
-        {/* Time */}
-        <div className="time-stepper-wrapper">
-          <TimeStepper initialTime={alarmTime} onTimeSelect={setAlarmTime} />
+    <div className="alarm-popup-overlay">
+      <div className="alarm-popup">
+        {/* Header */}
+        <div className="popup-header">
+          <button className="popup-close" onClick={onClose}>
+            ×
+          </button>
+          <h3 className="popup-title">New Alarm</h3>
+          <button className="popup-save" onClick={handleSave}>
+            ✓
+          </button>
         </div>
 
-        {/* Repeat */}
-        <div className="popup-section">
-          <h4>Repeat</h4>
-          <div className="repeat-section">
-            <button
-              id="repeat-once"
-              name="repeatMode"
-              className={`repeat-btn ${repeatMode === "once" ? "active" : ""}`}
-              onClick={() => setRepeatMode("once")}
-            >
-              Ring Once
-            </button>
+        {/* Scrollable body */}
+        <div className="popup-scroll">
+          <p className="ring-time-text">
+            Alarm will ring in <span>{remainingTime || "–"}</span>
+          </p>
 
-            <button
-              id="repeat-custom"
-              name="repeatMode"
-              className={`repeat-btn ${repeatMode === "custom" ? "active" : ""}`}
-              onClick={() => setRepeatMode("custom")}
-            >
-              Custom ▼
-            </button>
-          </div>
-        </div>
-
-        {/* Alarm Name */}
-        <div className="popup-section">
-          <h4>Alarm Name</h4>
-          <input
-            id="alarmName"
-            name="alarmName"
-            type="text"
-            className="text-input"
-            placeholder="Optional"
-            value={alarmName}
-            onChange={(e) => setAlarmName(e.target.value)}
-          />
-        </div>
-
-        {/* Ringtone */}
-        <div className="popup-section">
-          <h4>Ringtone</h4>
-          <select
-            id="ringtone"
-            name="ringtone"
-            className="select-input"
-            value={ringtone}
-            onChange={(e) => setRingtone(e.target.value)}
-          >
-            <option value="Default">Default</option>
-          </select>
-        </div>
-
-        {/* Toggles */}
-        <div className="popup-section toggle-wrapper">
-          <div className="toggle-row">
-            <span>Vibrate</span>
-            <label className="switch" htmlFor="vibrate">
-              <input
-                id="vibrate"
-                name="vibrate"
-                type="checkbox"
-                checked={vibrate}
-                onChange={(e) => setVibrate(e.target.checked)}
-              />
-              <span className="slider"></span>
-            </label>
+          {/* Time */}
+          <div className="time-stepper-wrapper">
+            <TimeStepper initialTime={alarmTime} onTimeSelect={setAlarmTime} />
           </div>
 
-          <div className="toggle-row">
-            <span>Snooze</span>
-            <label className="switch" htmlFor="snooze">
-              <input
-                id="snooze"
-                name="snooze"
-                type="checkbox"
-                checked={snooze}
-                onChange={(e) => setSnooze(e.target.checked)}
-              />
-              <span className="slider"></span>
-            </label>
+          {/* Repeat */}
+          <div className="popup-section">
+            <h4>Repeat</h4>
+            <div className="repeat-section">
+              <button
+                id="repeat-once"
+                name="repeatMode"
+                className={`repeat-btn ${
+                  repeatMode === "once" ? "active" : ""
+                }`}
+                onClick={() => setRepeatMode("once")}
+              >
+                Ring Once
+              </button>
+
+              <button
+                id="repeat-custom"
+                name="repeatMode"
+                className={`repeat-btn ${
+                  repeatMode === "custom" ? "active" : ""
+                }`}
+                onClick={() => setRepeatMode("custom")}
+              >
+                Custom ▼
+              </button>
+            </div>
+          </div>
+
+          {/* Alarm Name */}
+          <div className="popup-section">
+            <h4>Alarm Name</h4>
+            <input
+              id="alarmName"
+              name="alarmName"
+              type="text"
+              className="text-input"
+              placeholder="Optional"
+              value={alarmName}
+              onChange={(e) => setAlarmName(e.target.value)}
+            />
+          </div>
+
+          {/* Ringtone */}
+          <div className="popup-section">
+            <h4>Ringtone</h4>
+            <select
+              id="ringtone"
+              name="ringtone"
+              className="select-input"
+              value={ringtone}
+              onChange={(e) => setRingtone(e.target.value)}
+            >
+              <option value="Default">Default</option>
+            </select>
+          </div>
+
+          {/* Toggles */}
+          <div className="popup-section toggle-wrapper">
+            <div className="toggle-row">
+              <span>Vibrate</span>
+              <label className="popup-switch">
+                <input
+                  id="vibrate"
+                  name="vibrate"
+                  type="checkbox"
+                  checked={vibrate}
+                  onChange={(e) => setVibrate(e.target.checked)}
+                />
+                <span className="popup-slider"></span>
+              </label>
+            </div>
+
+            <div className="toggle-row">
+              <span>Snooze</span>
+
+              <label className="popup-switch">
+                <input
+                  id="snooze"
+                  name="snooze"
+                  type="checkbox"
+                  checked={snooze}
+                  onChange={(e) => setSnooze(e.target.checked)}
+                />
+                <span className="popup-slider"></span>
+              </label>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default AlarmPopup;
