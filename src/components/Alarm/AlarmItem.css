@@ -1,10 +1,11 @@
-.alarm-row {
+.alarm-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 10px;
+  padding: 6px 8px;
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
+  border-radius: 15px;
   gap: 8px;
 }
 
@@ -12,11 +13,15 @@
   display: flex;
   flex-direction: column;
   line-height: 1.1;
-  gap: 2px;
+  gap: 0;
+}
+.alarm-info p {
+  margin: 3px;
+  padding: 0;
 }
 
 .alarm-time {
-  font-size: 18px;        /* DOWN */
+  font-size: 16px;        /* DOWN */
   font-weight: 600;
   color: #0f172a;
 }
@@ -34,8 +39,8 @@
 /* 🔵 ALARM LIST SWITCH — smaller, compact */
 .alarm-switch {
   position: relative;
-  width: 36px;
-  height: 20px;
+  width: 32px;
+  height: 18px;
   cursor: pointer;
 }
 
@@ -54,8 +59,8 @@
 .alarm-slider::before {
   content: "";
   position: absolute;
-  height: 14px;
-  width: 14px;
+  height: 12px;
+  width: 12px;
   left: 3px;
   bottom: 3px;
   background: white;
@@ -69,5 +74,5 @@
 }
 
 .alarm-switch input:checked + .alarm-slider::before {
-  transform: translateX(16px);
+  transform: translateX(14px);
 }
