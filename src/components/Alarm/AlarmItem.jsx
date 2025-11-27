@@ -3,7 +3,7 @@ import "./AlarmItem.css";
 
 const AlarmItem = ({ alarm, onToggle }) => {
   return (
-    <div className="alarm-row">
+    <div className="alarm-item">
       {/* LEFT */}
       <div className="alarm-info">
         <p className="alarm-time">{alarm.time}</p>

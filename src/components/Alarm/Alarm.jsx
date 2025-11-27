@@ -80,7 +80,7 @@ const Alarm = () => {
           </p>
         ) : (
           alarms.map((alarm) => (
-            <div className="alarm-card" key={alarm.id}>
+            <div className="alarm-item-wrapper" key={alarm.id}>
               <AlarmItem
                 alarm={alarm}
                 onToggle={(id) =>
