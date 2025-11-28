@@ -20,7 +20,22 @@ const AlarmPopup = ({ onClose, onSave }) => {
   const [alarmTime, setAlarmTime] = useState(getCurrentTime());
   const [alarmName, setAlarmName] = useState("");
   const [ringtone, setRingtone] = useState("Default");
+
+  // Repeat section
   const [repeatMode, setRepeatMode] = useState("once"); // once | custom
+  const [repeatDays, setRepeatDays] = useState([]); // Mon..Sun array
+
+  const toggleDay = (day) => {
+    setRepeatDays((prev) =>
+      prev.includes(day)
+        ? prev.filter((d) => d !== day)
+        : [...prev, day]
+    );
+  };
+
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+  // Toggles
   const [vibrate, setVibrate] = useState(true);
   const [snooze, setSnooze] = useState(true);
 
@@ -62,6 +77,7 @@ const AlarmPopup = ({ onClose, onSave }) => {
   useEffect(() => {
     setRemainingTime(calculateRemainingTime(alarmTime));
   }, [alarmTime]);
+
   // ---------------------------
 
   const handleSave = () => {
@@ -69,7 +85,8 @@ const AlarmPopup = ({ onClose, onSave }) => {
       id: Date.now(),
       time: alarmTime,
       name: alarmName,
-      repeat: repeatMode,
+      repeatMode,
+      repeatDays,
       ringtone,
       vibrate,
       snooze,
@@ -84,19 +101,17 @@ const AlarmPopup = ({ onClose, onSave }) => {
   return (
     <div className="alarm-popup-overlay">
       <div className="alarm-popup">
+
         {/* Header */}
         <div className="popup-header">
-          <button className="popup-close" onClick={onClose}>
-            ×
-          </button>
+          <button className="popup-close" onClick={onClose}>×</button>
           <h3 className="popup-title">New Alarm</h3>
-          <button className="popup-save" onClick={handleSave}>
-            ✓
-          </button>
+          <button className="popup-save" onClick={handleSave}>✓</button>
         </div>
 
         {/* Scrollable body */}
         <div className="popup-scroll">
+
           <p className="ring-time-text">
             Alarm will ring in <span>{remainingTime || "–"}</span>
           </p>
@@ -109,37 +124,43 @@ const AlarmPopup = ({ onClose, onSave }) => {
           {/* Repeat */}
           <div className="popup-section">
             <h4>Repeat</h4>
+
             <div className="repeat-section">
               <button
-                id="repeat-once"
-                name="repeatMode"
-                className={`repeat-btn ${
-                  repeatMode === "once" ? "active" : ""
-                }`}
+                className={`repeat-btn ${repeatMode === "once" ? "active" : ""}`}
                 onClick={() => setRepeatMode("once")}
               >
                 Ring Once
               </button>
 
               <button
-                id="repeat-custom"
-                name="repeatMode"
-                className={`repeat-btn ${
-                  repeatMode === "custom" ? "active" : ""
-                }`}
+                className={`repeat-btn ${repeatMode === "custom" ? "active" : ""}`}
                 onClick={() => setRepeatMode("custom")}
               >
                 Custom ▼
               </button>
             </div>
+
+            {/* Custom day chips */}
+            {repeatMode === "custom" && (
+              <div className="repeat-days-row">
+                {days.map((day) => (
+                  <div
+                    key={day}
+                    className={`day-chip ${repeatDays.includes(day) ? "selected" : ""}`}
+                    onClick={() => toggleDay(day)}
+                  >
+                    {day}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Alarm Name */}
           <div className="popup-section">
             <h4>Alarm Name</h4>
             <input
-              id="alarmName"
-              name="alarmName"
               type="text"
               className="text-input"
               placeholder="Optional"
@@ -152,8 +173,6 @@ const AlarmPopup = ({ onClose, onSave }) => {
           <div className="popup-section">
             <h4>Ringtone</h4>
             <select
-              id="ringtone"
-              name="ringtone"
               className="select-input"
               value={ringtone}
               onChange={(e) => setRingtone(e.target.value)}
@@ -164,12 +183,11 @@ const AlarmPopup = ({ onClose, onSave }) => {
 
           {/* Toggles */}
           <div className="popup-section toggle-wrapper">
+
             <div className="toggle-row">
               <span>Vibrate</span>
               <label className="popup-switch">
                 <input
-                  id="vibrate"
-                  name="vibrate"
                   type="checkbox"
                   checked={vibrate}
                   onChange={(e) => setVibrate(e.target.checked)}
@@ -180,11 +198,8 @@ const AlarmPopup = ({ onClose, onSave }) => {
 
             <div className="toggle-row">
               <span>Snooze</span>
-
               <label className="popup-switch">
                 <input
-                  id="snooze"
-                  name="snooze"
                   type="checkbox"
                   checked={snooze}
                   onChange={(e) => setSnooze(e.target.checked)}
@@ -192,6 +207,7 @@ const AlarmPopup = ({ onClose, onSave }) => {
                 <span className="popup-slider"></span>
               </label>
             </div>
+
           </div>
         </div>
       </div>
@@ -200,3 +216,4 @@ const AlarmPopup = ({ onClose, onSave }) => {
 };
 
 export default AlarmPopup;
+
