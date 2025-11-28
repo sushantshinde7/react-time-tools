@@ -27,9 +27,7 @@ const AlarmPopup = ({ onClose, onSave }) => {
 
   const toggleDay = (day) => {
     setRepeatDays((prev) =>
-      prev.includes(day)
-        ? prev.filter((d) => d !== day)
-        : [...prev, day]
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
     );
   };
 
@@ -101,17 +99,19 @@ const AlarmPopup = ({ onClose, onSave }) => {
   return (
     <div className="alarm-popup-overlay">
       <div className="alarm-popup">
-
         {/* Header */}
         <div className="popup-header">
-          <button className="popup-close" onClick={onClose}>×</button>
+          <button className="popup-close" onClick={onClose}>
+            ×
+          </button>
           <h3 className="popup-title">New Alarm</h3>
-          <button className="popup-save" onClick={handleSave}>✓</button>
+          <button className="popup-save" onClick={handleSave}>
+            ✓
+          </button>
         </div>
 
         {/* Scrollable body */}
         <div className="popup-scroll">
-
           <p className="ring-time-text">
             Alarm will ring in <span>{remainingTime || "–"}</span>
           </p>
@@ -127,34 +127,44 @@ const AlarmPopup = ({ onClose, onSave }) => {
 
             <div className="repeat-section">
               <button
-                className={`repeat-btn ${repeatMode === "once" ? "active" : ""}`}
+                className={`repeat-btn ${
+                  repeatMode === "once" ? "active" : ""
+                }`}
                 onClick={() => setRepeatMode("once")}
               >
                 Ring Once
               </button>
 
               <button
-                className={`repeat-btn ${repeatMode === "custom" ? "active" : ""}`}
+                className={`repeat-btn ${
+                  repeatMode === "custom" ? "active" : ""
+                }`}
                 onClick={() => setRepeatMode("custom")}
               >
-                Custom ▼
+                Custom
               </button>
             </div>
 
             {/* Custom day chips */}
-            {repeatMode === "custom" && (
+            <div
+              className={`repeat-days-row-wrapper ${
+                repeatMode === "custom" ? "open" : ""
+              }`}
+            >
               <div className="repeat-days-row">
                 {days.map((day) => (
                   <div
                     key={day}
-                    className={`day-chip ${repeatDays.includes(day) ? "selected" : ""}`}
+                    className={`day-chip ${
+                      repeatDays.includes(day) ? "selected" : ""
+                    }`}
                     onClick={() => toggleDay(day)}
                   >
                     {day}
                   </div>
                 ))}
               </div>
-            )}
+            </div>
           </div>
 
           {/* Alarm Name */}
@@ -183,7 +193,6 @@ const AlarmPopup = ({ onClose, onSave }) => {
 
           {/* Toggles */}
           <div className="popup-section toggle-wrapper">
-
             <div className="toggle-row">
               <span>Vibrate</span>
               <label className="popup-switch">
@@ -207,7 +216,6 @@ const AlarmPopup = ({ onClose, onSave }) => {
                 <span className="popup-slider"></span>
               </label>
             </div>
-
           </div>
         </div>
       </div>
@@ -216,4 +224,3 @@ const AlarmPopup = ({ onClose, onSave }) => {
 };
 
 export default AlarmPopup;
-
