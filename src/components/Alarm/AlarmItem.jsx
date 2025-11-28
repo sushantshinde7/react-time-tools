@@ -1,5 +1,7 @@
 import React from "react";
 import "./AlarmItem.css";
+import { formatRepeatText } from "../../utils/repeatFormatter";
+
 
 const AlarmItem = ({ alarm, onToggle }) => {
   return (
@@ -11,7 +13,7 @@ const AlarmItem = ({ alarm, onToggle }) => {
         {alarm.name && <p className="alarm-label">{alarm.name}</p>}
 
         <p className="alarm-repeat">
-          {alarm.repeat === "once" ? "Once" : "Mon Tue Fri"}
+          {formatRepeatText(alarm.repeatDays)}
         </p>
       </div>
 

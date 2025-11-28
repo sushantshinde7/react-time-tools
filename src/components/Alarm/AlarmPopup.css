@@ -152,6 +152,33 @@
   background: #ffffff;
   color: #2563eb;
 }
+.repeat-days-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1px;
+  margin-bottom: 1px;
+  padding: 2px 1px;
+}
+
+.day-chip {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  cursor: pointer;
+  background: #f1f5f9;
+  color: #1e293b;
+  transition: 0.2s;
+  user-select: none;
+}
+
+.day-chip.selected {
+  background: #2563eb;
+  color: #fff;
+}
+
+.day-chip:hover {
+  background: #e2e8f0;
+}
 
 /* Inputs */
 .text-input,
