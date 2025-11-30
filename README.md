@@ -1,81 +1,80 @@
-🕒 React Time Tools
+# 🕒 React Time Tools
 
-A sleek and minimal React + Vite application that brings together multiple time-based utilities — Stopwatch, World Clock, Timer, and Alarm — all in one clean, responsive interface.
+A sleek and minimal **React + Vite** application that combines multiple time-based utilities — **Stopwatch, World Clock, Timer, and Alarm** — in one clean, responsive interface.
 
-This project focuses on smooth UI, modular components, and modern UX while keeping everything simple, fast, and user-friendly.
+This project focuses on modular structure, smooth UI, and modern UX.
 
-🚀 Features
-✅ Completed Tools
+---
 
-⏱️ Stopwatch — Lap tracking, reset, and smooth circular progress animation
+## 🚀 Features
 
-🌍 World Clock — Multi-city support with real-time timezone updates
+### ✅ Completed Tools
+- **⏱️ Stopwatch** — Lap tracking & circular progress animation  
+- **🌍 World Clock** — Multiple cities + timezone updates  
+- **⏲️ Timer** — Custom countdown with animations  
+- **⏰ Alarm** — Create, edit, delete, save alarms (sound + notifications coming soon)
 
-⏲️ Timer — Custom countdown with animations
+---
 
-⏰ Alarm — Create, edit, delete, and save alarms with a clean UI (sound + notifications coming soon)
+## 🧭 Core UI Features
+- Tabbed navigation  
+- Mobile-friendly responsive layout  
+- Smooth CSS animations  
+- LocalStorage support  
+- Modular components  
 
-🧭 Core UI Features
+---
 
-Intuitive tabbed navigation
+## 🛠️ Tech Stack
 
-Responsive and mobile-friendly
+### Frontend
+- React  
+- Vite  
+- React Hooks  
+- Context API  
 
-Clean CSS-based animations
+### Styling
+- CSS3  
+- Custom transitions  
 
-LocalStorage support for alarms
+### Build Tools
+- ESLint  
+- Vite (with internal Babel)
 
-Modular component architecture
+---
 
-🛠️ Tech Stack
-Frontend
+## 📦 Getting Started
 
-React
-
-Vite
-
-Context API
-
-React Hooks
-
-Styling
-
-CSS3
-
-Custom animations and transitions
-
-Build Tools
-
-ESLint
-
-Vite (Babel internal)
-
-📦 Getting Started
-
-Clone the repository:
-
+### 1. Clone the repository
+```bash
 git clone https://github.com/sushantshinde7/react-time-tools.git
 cd react-time-tools
+```
 
-
-Install dependencies:
-
+### 2. Install dependencies
+```bash
 npm install
+```
 
-
-Start the development server:
-
+### 3. Start the development server
+```bash
 npm run dev
+```
 
-
-Open in browser:
-
+### 4. Open in browser
+```
 http://localhost:5173
+```
 
-📁 Folder Structure
+---
+
+## 📁 Folder Structure
+
+```text
 REACT-TIME-TOOLS
 │
 ├── node_modules/
+│
 ├── public/
 │   └── vite.svg
 │
@@ -124,30 +123,28 @@ REACT-TIME-TOOLS
 ├── package-lock.json
 ├── README.md
 └── vite.config.js
+```
 
-🧩 Roadmap
-✔️ Completed
+---
 
-Stopwatch UI + laps + animations
+## 🧩 Roadmap
 
-World Clock with multiple cities
+### ✔️ Completed
+- Stopwatch UI + laps + animations  
+- World Clock (multi-city support)  
+- Timer with custom durations  
+- Alarm (add / edit / delete / persist)  
 
-Timer with custom durations
+### 🚧 Upcoming
+- Alarm ringtone + browser notifications  
+- Repeat alarms (daily / custom days)  
+- Dark/Light mode + color themes  
+- Drag-and-drop city clocks  
+- UI/UX improvements  
 
-Alarm (create, edit, delete, save)
+---
 
-🚧 Upcoming / In Progress
+## 📄 License
 
-🔔 Alarm ring sound & notifications
+This project is available under the **MIT License**.
 
-📅 Repeat alarms (daily / custom days)
-
-🎨 Theme customization (dark/light + color themes)
-
-🔄 Drag-and-drop city clocks
-
-⚡ UI/UX refinements and performance improvements
-
-📄 License
-
-This project is open-source and available under the MIT License.
