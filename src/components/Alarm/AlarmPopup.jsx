@@ -19,7 +19,17 @@ const AlarmPopup = ({ onClose, onSave }) => {
   // ---- Phase 1 states ----
   const [alarmTime, setAlarmTime] = useState(getCurrentTime());
   const [alarmName, setAlarmName] = useState("");
-  const [ringtone, setRingtone] = useState("Default");
+  const [ringtone, setRingtone] = useState("Soft Morning");
+  const [ringtoneOpen, setRingtoneOpen] = useState(false);
+
+  const ringtoneOptions = [
+    "Soft Morning",
+    "Ocean Wave",
+    "Bell Ting",
+    "Classic Alarm",
+    "Chimes",
+    "Digital Beep",
+  ];
 
   // Repeat section
   const [repeatMode, setRepeatMode] = useState("once"); // once | custom
@@ -182,13 +192,38 @@ const AlarmPopup = ({ onClose, onSave }) => {
           {/* Ringtone */}
           <div className="popup-section">
             <h4>Ringtone</h4>
-            <select
-              className="select-input"
-              value={ringtone}
-              onChange={(e) => setRingtone(e.target.value)}
+
+            <div
+              className="ringtone-selected"
+              onClick={() => setRingtoneOpen(!ringtoneOpen)}
             >
-              <option value="Default">Default</option>
-            </select>
+              {ringtone}
+              <span className={`rt-arrow ${ringtoneOpen ? "open" : ""}`}>
+                ▼
+              </span>
+            </div>
+
+            <div
+              className={`ringtone-list-wrapper ${ringtoneOpen ? "open" : ""}`}
+            >
+              <div className="ringtone-list">
+                {ringtoneOptions.map((name) => (
+                  <div
+                    key={name}
+                    className={`ringtone-item ${
+                      ringtone === name ? "active" : ""
+                    }`}
+                    onClick={() => {
+                      setRingtone(name);
+                      setRingtoneOpen(false);
+                    }}
+                  >
+                    {name}
+                    {ringtone === name && <span className="rt-check">✓</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Toggles */}
