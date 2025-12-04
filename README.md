@@ -93,8 +93,10 @@ REACT-TIME-TOOLS
 │   │   │   ├── AlarmItem.css
 │   │   │   ├── AlarmPopup.jsx
 │   │   │   ├── AlarmPopup.css
+│   │   │   ├── RingingModal.jsx
+│   │   │   ├── RingingModal.css
 │   │   │   ├── TimeStepper.jsx
-│   │   │   └── TimeStepper.css
+│   │   │   └──TimeStepper.css 
 │   │   │
 │   │   ├── Clock/
 │   │   │   ├── AnalogClock.jsx
@@ -111,6 +113,15 @@ REACT-TIME-TOOLS
 │   │       ├── Timer.jsx
 │   │       └── Timer.css
 │   │
+│   ├── sounds/
+│   │    ├── airtel.mp3
+│   │    ├── docomo.mp3
+│   │    ├── galaxy_1.mp3
+│   │    ├── galaxy_2.mp3
+│   │    ├── nokia_classic.mp3
+│   │    ├── realme.mp3
+│   │    └── reliance.mp3
+│   │
 │   ├── App.css
 │   ├── App.jsx
 │   ├── index.css
@@ -123,6 +134,7 @@ REACT-TIME-TOOLS
 ├── package-lock.json
 ├── README.md
 └── vite.config.js
+
 ```
 
 ---
