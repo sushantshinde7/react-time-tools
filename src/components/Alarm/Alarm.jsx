@@ -2,31 +2,36 @@ import React, { useState, useRef, useEffect } from "react";
 import "./Alarm.css";
 import AlarmPopup from "./AlarmPopup";
 import AlarmItem from "./AlarmItem";
+import RingingModal from "./RingingModal";
 
 const Alarm = () => {
+
   // ----------------------------------------
-  // SAFE LOCALSTORAGE INITIALIZATION
+  // LOCAL STORAGE
   // ----------------------------------------
   const [alarms, setAlarms] = useState(() => {
     try {
       const saved = localStorage.getItem("alarms");
-      const parsed = saved ? JSON.parse(saved) : [];
-      return Array.isArray(parsed) ? parsed : [];
+      return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
     }
   });
 
-  const [editMode, setEditMode] = useState(false);
+  const [ringingAlarm, setRingingAlarm] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const navRef = useRef(null);
 
-  // SAVE ON EVERY CHANGE
+  // GLOBAL AUDIO REF (important)
+  const audioRef = useRef(null);
+
+  // save alarms on change
   useEffect(() => {
     localStorage.setItem("alarms", JSON.stringify(alarms));
   }, [alarms]);
 
-  // CLOSE EDIT MODE IF CLICK OUTSIDE
+  // click outside edit-mode close
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (editMode && navRef.current && !navRef.current.contains(e.target)) {
@@ -35,14 +40,125 @@ const Alarm = () => {
     };
 
     if (editMode) document.addEventListener("mousedown", handleClickOutside);
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [editMode]);
 
+  // -------------------------------------------------------
+  // 🔥 SCHEDULER — core alarm engine
+  // -------------------------------------------------------
+  useEffect(() => {
+    const checkAlarm = () => {
+      const now = new Date();
+      const h = now.getHours();
+      const m = now.getMinutes();
+      const nowKey = `${h}:${m}`;
+
+      setAlarms((prev) =>
+        prev.map((alarm) => {
+          if (!alarm.isOn) return alarm;
+
+          // avoid duplicate
+          if (alarm.lastTriggered === nowKey) return alarm;
+
+          // convert alarm time
+          const [time, ampm] = alarm.time.split(" ");
+          let [ah, am] = time.split(":").map(Number);
+
+          if (ampm === "PM" && ah !== 12) ah += 12;
+          if (ampm === "AM" && ah === 12) ah = 0;
+
+          // match
+          if (ah === h && am === m) {
+            // check repeat custom
+            if (alarm.repeatMode === "custom") {
+              const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+              const today = days[now.getDay()];
+              if (!alarm.repeatDays.includes(today)) {
+                return alarm;
+              }
+            }
+
+            // start ringing
+            setRingingAlarm(alarm);
+
+            // PLAY sound looping
+            if (audioRef.current) {
+              audioRef.current.pause();
+            }
+            audioRef.current = new Audio(
+              alarm.ringtone
+                ? `/src/sounds/${alarm.ringtone}.mp3`
+                : "/src/sounds/airtel.mp3"
+            );
+            audioRef.current.loop = true;   // <--- important!
+            audioRef.current.play();
+
+            return {
+              ...alarm,
+              lastTriggered: nowKey,
+              isOn: alarm.repeatMode === "once" ? false : true,
+            };
+          }
+
+          return alarm;
+        })
+      );
+    };
+
+    const interval = setInterval(checkAlarm, 2000); // check every 2s
+    return () => clearInterval(interval);
+  }, []);
+
+  // -------------------------------------------------------
+  // STOP + SNOOZE
+  // -------------------------------------------------------
+  const stopAlarm = () => {
+    if (audioRef.current) audioRef.current.pause();
+    setRingingAlarm(null);
+  };
+
+  const handleSnooze = () => {
+    const snoozeMins = 5;
+
+    setAlarms((prev) =>
+      prev.map((a) => {
+        if (a.id !== ringingAlarm.id) return a;
+
+        // convert current alarm time to 24hr
+        const [time, ampm] = a.time.split(" ");
+        let [hh, mm] = time.split(":").map(Number);
+
+        if (ampm === "PM" && hh !== 12) hh += 12;
+        if (ampm === "AM" && hh === 12) hh = 0;
+
+        const d = new Date();
+        d.setHours(hh, mm + snoozeMins);
+
+        let newH = d.getHours();
+        const newM = d.getMinutes();
+
+        const newAmpm = newH >= 12 ? "PM" : "AM";
+        newH = newH % 12 || 12;
+
+        const newTime =
+          `${String(newH).padStart(2, "0")}:` +
+          `${String(newM).padStart(2, "0")} ${newAmpm}`;
+
+        return { ...a, time: newTime, isOn: true };
+      })
+    );
+
+    stopAlarm();
+  };
+
+  // -------------------------------------------------------
+  // UI
+  // -------------------------------------------------------
   return (
     <div className="alarm-container">
-      {/* ----------------------------------------
-          TOP NAVBAR
-      ----------------------------------------- */}
+
+      {/* NAV */}
       <div className="alarm-nav" ref={navRef}>
         <button
           className={`nav-btn ${editMode ? "active" : ""}`}
@@ -70,14 +186,10 @@ const Alarm = () => {
         </button>
       </div>
 
-      {/* ----------------------------------------
-          ALARM LIST
-      ----------------------------------------- */}
+      {/* LIST */}
       <div className="alarm-list">
         {alarms.length === 0 ? (
-          <p className="alarm-list-placeholder">
-            ⏰ No alarms added
-          </p>
+          <p className="alarm-list-placeholder">⏰ No alarms added</p>
         ) : (
           alarms.map((alarm) => (
             <div className="alarm-item-wrapper" key={alarm.id}>
@@ -96,16 +208,23 @@ const Alarm = () => {
         )}
       </div>
 
-      {/* ----------------------------------------
-          POPUP
-      ----------------------------------------- */}
+      {/* POPUP */}
       {showPopup && (
         <AlarmPopup
           onClose={() => setShowPopup(false)}
           onSave={(newAlarm) => {
-            setAlarms((prev) => [...prev, newAlarm]);
+            setAlarms((p) => [...p, newAlarm]);
             setShowPopup(false);
           }}
+        />
+      )}
+
+      {/* RINGING MODAL */}
+      {ringingAlarm && (
+        <RingingModal
+          alarm={ringingAlarm}
+          onStop={stopAlarm}
+          onSnooze={handleSnooze}
         />
       )}
     </div>
