@@ -59,30 +59,36 @@ const AlarmPopup = ({ onClose, onSave }) => {
   const [remainingTime, setRemainingTime] = useState("");
 
   const calculateRemainingTime = (timeStr) => {
-    if (!timeStr) return "";
+  if (!timeStr) return "";
 
-    const [time, ampm] = timeStr.split(" ");
-    let [hours, minutes] = time.split(":").map(Number);
+  const [time, ampm] = timeStr.split(" ");
+  let [hours, minutes] = time.split(":").map(Number);
 
-    // Convert to 24h format
-    if (ampm === "PM" && hours !== 12) hours += 12;
-    if (ampm === "AM" && hours === 12) hours = 0;
+  // convert to 24h
+  if (ampm === "PM" && hours !== 12) hours += 12;
+  if (ampm === "AM" && hours === 12) hours = 0;
 
-    const now = new Date();
-    const alarm = new Date();
+  const now = new Date();
+  const alarm = new Date();
+  alarm.setHours(hours, minutes, 0, 0);
 
-    alarm.setHours(hours, minutes, 0, 0);
+  if (alarm <= now) alarm.setDate(alarm.getDate() + 1);
 
-    if (alarm <= now) alarm.setDate(alarm.getDate() + 1);
+  const diffMs = alarm - now;
 
-    const diffMs = alarm - now;
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  // use ceil to avoid 0m problem
+  const diffMinutes = Math.ceil(diffMs / (1000 * 60));
 
-    const hrs = Math.floor(diffMinutes / 60);
-    const mins = diffMinutes % 60;
+  const hrs = Math.floor(diffMinutes / 60);
+  const mins = diffMinutes % 60;
 
-    return `${hrs}h ${mins}m`;
-  };
+  // ---- NEW FORMATTING ----
+  if (hrs === 0) {
+    return `${mins}m`;
+  }
+  return `${hrs}h ${mins}m`;
+};
+
 
   // Update remaining time whenever alarm time changes
   useEffect(() => {
