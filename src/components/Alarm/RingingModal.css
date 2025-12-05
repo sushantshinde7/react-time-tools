@@ -1,47 +1,167 @@
+/* Overlay */
 .ringing-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 5000;
 }
 
-.ringing-box {
-  background: #fff;
-  padding: 24px;
-  border-radius: 16px;
+/* Card */
+.ringing-card {
+  position: relative;
+  width: 330px;
+  background: #f9fafb;
+  border-radius: 22px;
+  padding: 28px 20px 32px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.12);
   text-align: center;
-  width: 90%;
-  max-width: 350px;
+  overflow: hidden;
 }
 
+/* Pop animation */
+.scale-in {
+  animation: scaleIn 0.35s ease;
+}
+@keyframes scaleIn {
+  from { transform: scale(0.75); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* --- MODERN RIPPLE + ROTATION (fixed) --- */
+.ringing-animation {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 220px;
+  pointer-events: none;
+  opacity: 0.52;
+  filter: blur(0.2px);
+  /* slight backface to keep crisp on some browsers */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Base ring styling */
+.rect {
+  position: absolute;
+  border: 1.4px solid rgba(0,0,0,0.62);
+  border-radius: 50%;
+  transform-origin: center;
+  /* single combined animation for scale + rotation */
+  animation: rippleSpin 3.6s cubic-bezier(.4,.0,.2,1) infinite;
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+  border-color: rgba(0,140,220,0.85);
+  box-shadow:
+    0 0 8px rgba(0,170,255,0.5),
+    0 0 16px rgba(0,170,255,0.35),
+    0 0 28px rgba(0,170,255,0.2);
+  
+}
+
+/* Sizes/positions */
+.rect:nth-child(1)  { width: 14%;  height: 14%;  top: 43%; left: 43%; --i:0; --rot: -1.2deg; }
+.rect:nth-child(2)  { width: 22%;  height: 22%;  top: 39%; left: 39%; --i:1; --rot: 1.0deg;  }
+.rect:nth-child(3)  { width: 30%;  height: 30%;  top: 35%; left: 35%; --i:2; --rot: -0.9deg; }
+.rect:nth-child(4)  { width: 38%;  height: 38%;  top: 31%; left: 31%; --i:3; --rot: 1.4deg;  }
+.rect:nth-child(5)  { width: 46%;  height: 46%;  top: 27%; left: 27%; --i:4; --rot: -1.6deg; }
+.rect:nth-child(6)  { width: 54%;  height: 54%;  top: 23%; left: 23%; --i:5; --rot: 1.2deg;  }
+.rect:nth-child(7)  { width: 62%;  height: 62%;  top: 19%; left: 19%; --i:6; --rot: -1.0deg; }
+.rect:nth-child(8)  { width: 70%;  height: 70%;  top: 15%; left: 15%; --i:7; --rot: 0.9deg;  }
+.rect:nth-child(9)  { width: 78%;  height: 78%;  top: 11%; left: 11%; --i:8; --rot: -1.3deg; }
+.rect:nth-child(10) { width: 86%;  height: 86%;  top: 7%;  left: 7%;  --i:9; --rot: 1.6deg;  }
+.rect:nth-child(11) { width: 94%;  height: 94%;  top: 3%;  left: 3%;  --i:10; --rot: -1.5deg; }
+.rect:nth-child(12) { width: 102%; height: 102%; top: -1%; left: -1%; --i:11; --rot: 1.1deg;  }
+
+/* Staggered delays (keeps rhythm natural) */
+.rect {
+  animation-delay: calc(var(--i) * 0.08s);
+  
+}
+
+/* Combined ripple + slight rotate keyframes */
+@keyframes rippleSpin {
+  0% {
+    transform: scale(0.92) rotate(calc(var(--rot) * -1));
+    opacity: 0.58;
+    filter: blur(0px);
+  }
+  40% {
+    transform: scale(1.06) rotate(calc(var(--rot) * 1));
+    opacity: 0.88;
+    filter: blur(0.2px);
+  }
+  100% {
+    transform: scale(0.92) rotate(calc(var(--rot) * -1));
+    opacity: 0.58;
+    filter: blur(0px);
+  }
+}
+
+/* Optional: gentle glow for outermost rings only (subtle) */
+.rect:nth-child(11),
+.rect:nth-child(12) {
+  border-color: rgba(0,140,220,0.85);
+  box-shadow:
+    0 0 8px rgba(0,170,255,0.5),
+    0 0 16px rgba(0,170,255,0.35),
+    0 0 28px rgba(0,170,255,0.2);
+}
+
+/* Keep text above the rings */
+.ringing-time,
+.ringing-name,
+.ringing-buttons button {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* Text */
 .ringing-time {
-  font-size: 40px;
-  margin: 0;
+  font-size: 48px;
+  font-weight: 700;
+  color: #020203;
+  margin-top: 20px;
+  position: relative;
+  z-index: 2;
 }
 
 .ringing-name {
   font-size: 18px;
-  opacity: 0.7;
-  margin-bottom: 20px;
+  opacity: 0.75;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 2;
 }
 
+/* Buttons */
 .ringing-buttons button {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   font-size: 18px;
-  margin-top: 10px;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
+  margin-top: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  position: relative;
+  z-index: 2;
 }
 
 .stop-btn {
   background: #ff4747;
   color: white;
+  box-shadow: 0 4px 14px rgba(255, 70, 70, 0.4);
 }
 
 .snooze-btn {
-  background: #f0f0f0;
+  background: #eef1f4;
+  color: #1e293b;
 }
