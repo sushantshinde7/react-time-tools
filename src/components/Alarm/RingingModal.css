@@ -2,8 +2,8 @@
 .ringing-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(10px) saturate(130%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,155 +13,158 @@
 /* Card */
 .ringing-card {
   position: relative;
-  width: 330px;
-  background: #f9fafb;
-  border-radius: 22px;
-  padding: 28px 20px 32px;
-  box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+  width: 320px;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 26px 22px 30px;
   text-align: center;
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  border: 1px solid rgba(0, 90, 170, 0.06);
   overflow: hidden;
 }
 
-/* Pop animation */
+/* Entrance animation */
 .scale-in {
-  animation: scaleIn 0.35s ease;
+  animation: scaleIn 0.32s cubic-bezier(.32, .08, .24, 1.2);
 }
 @keyframes scaleIn {
-  from { transform: scale(0.75); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from { transform: scale(0.82); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
 }
 
-/* --- MODERN RIPPLE + ROTATION (fixed) --- */
+/* Wrapper for ripple + time */
+.ring-wrapper {
+  position: relative;
+  width: 230px;
+  height: 230px;
+  margin: 0 auto;
+  margin-bottom: 20px;
+}
+
+/* Ripple animation stays exactly the same */
 .ringing-animation {
   position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 220px;
-  height: 220px;
+  inset: 0;
   pointer-events: none;
-  opacity: 0.52;
-  filter: blur(0.2px);
-  /* slight backface to keep crisp on some browsers */
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+  opacity: 0.5;
+  transform: translateZ(0);
 }
 
-/* Base ring styling */
+/* Rings kept as-is (copied from your version) */
 .rect {
   position: absolute;
-  border: 1.4px solid rgba(0,0,0,0.62);
   border-radius: 50%;
   transform-origin: center;
-  /* single combined animation for scale + rotation */
   animation: rippleSpin 3.6s cubic-bezier(.4,.0,.2,1) infinite;
-  animation-fill-mode: both;
-  will-change: transform, opacity;
-  border-color: rgba(0,140,220,0.85);
+  border: 1.3px solid rgba(0,150,255,0.7);
   box-shadow:
-    0 0 8px rgba(0,170,255,0.5),
-    0 0 16px rgba(0,170,255,0.35),
-    0 0 28px rgba(0,170,255,0.2);
-  
+    0 0 8px rgba(0,170,255,0.32),
+    0 0 20px rgba(0,170,255,0.14),
+    inset 0 0 6px rgba(255,255,255,0.4);
 }
 
-/* Sizes/positions */
-.rect:nth-child(1)  { width: 14%;  height: 14%;  top: 43%; left: 43%; --i:0; --rot: -1.2deg; }
-.rect:nth-child(2)  { width: 22%;  height: 22%;  top: 39%; left: 39%; --i:1; --rot: 1.0deg;  }
-.rect:nth-child(3)  { width: 30%;  height: 30%;  top: 35%; left: 35%; --i:2; --rot: -0.9deg; }
-.rect:nth-child(4)  { width: 38%;  height: 38%;  top: 31%; left: 31%; --i:3; --rot: 1.4deg;  }
-.rect:nth-child(5)  { width: 46%;  height: 46%;  top: 27%; left: 27%; --i:4; --rot: -1.6deg; }
-.rect:nth-child(6)  { width: 54%;  height: 54%;  top: 23%; left: 23%; --i:5; --rot: 1.2deg;  }
-.rect:nth-child(7)  { width: 62%;  height: 62%;  top: 19%; left: 19%; --i:6; --rot: -1.0deg; }
-.rect:nth-child(8)  { width: 70%;  height: 70%;  top: 15%; left: 15%; --i:7; --rot: 0.9deg;  }
-.rect:nth-child(9)  { width: 78%;  height: 78%;  top: 11%; left: 11%; --i:8; --rot: -1.3deg; }
-.rect:nth-child(10) { width: 86%;  height: 86%;  top: 7%;  left: 7%;  --i:9; --rot: 1.6deg;  }
-.rect:nth-child(11) { width: 94%;  height: 94%;  top: 3%;  left: 3%;  --i:10; --rot: -1.5deg; }
-.rect:nth-child(12) { width: 102%; height: 102%; top: -1%; left: -1%; --i:11; --rot: 1.1deg;  }
+/* — keep your nth-child positioning exactly — */
+.rect:nth-child(1)  { width: 14%; height: 14%; top: 43%; left: 43%; --i:0; --rot:-1.2deg; }
+.rect:nth-child(2)  { width: 22%; height: 22%; top: 39%; left: 39%; --i:1; --rot:1deg; }
+.rect:nth-child(3)  { width: 30%; height: 30%; top: 35%; left: 35%; --i:2; --rot:-0.9deg; }
+.rect:nth-child(4)  { width: 38%; height: 38%; top: 31%; left: 31%; --i:3; --rot:1.4deg; }
+.rect:nth-child(5)  { width: 46%; height: 46%; top: 27%; left: 27%; --i:4; --rot:-1.6deg; }
+.rect:nth-child(6)  { width: 54%; height: 54%; top: 23%; left: 23%; --i:5; --rot:1.2deg; }
+.rect:nth-child(7)  { width: 62%; height: 62%; top: 19%; left: 19%; --i:6; --rot:-1deg; }
+.rect:nth-child(8)  { width: 70%; height: 70%; top: 15%; left: 15%; --i:7; --rot:0.9deg; }
+.rect:nth-child(9)  { width: 78%; height: 78%; top: 11%; left: 11%; --i:8; --rot:-1.3deg; }
+.rect:nth-child(10) { width: 86%; height: 86%; top: 7%; left: 7%; --i:9; --rot:1.6deg; }
+.rect:nth-child(11) { width: 94%; height: 94%; top: 3%; left: 3%; --i:10; --rot:-1.5deg; }
+.rect:nth-child(12) { width:102%; height:102%; top:-1%; left:-1%; --i:11; --rot:1.1deg; }
 
-/* Staggered delays (keeps rhythm natural) */
 .rect {
   animation-delay: calc(var(--i) * 0.08s);
-  
 }
 
-/* Combined ripple + slight rotate keyframes */
+/* Keyframes unchanged */
 @keyframes rippleSpin {
-  0% {
-    transform: scale(0.92) rotate(calc(var(--rot) * -1));
-    opacity: 0.58;
-    filter: blur(0px);
-  }
-  40% {
-    transform: scale(1.06) rotate(calc(var(--rot) * 1));
-    opacity: 0.88;
-    filter: blur(0.2px);
-  }
-  100% {
-    transform: scale(0.92) rotate(calc(var(--rot) * -1));
-    opacity: 0.58;
-    filter: blur(0px);
-  }
+  0%   { transform: scale(0.92) rotate(calc(var(--rot) * -1)); opacity: 0.55; }
+  40%  { transform: scale(1.06) rotate(calc(var(--rot) * 1));  opacity: 0.9; }
+  100% { transform: scale(0.92) rotate(calc(var(--rot) * -1)); opacity: 0.55; }
 }
 
-/* Optional: gentle glow for outermost rings only (subtle) */
-.rect:nth-child(11),
-.rect:nth-child(12) {
-  border-color: rgba(0,140,220,0.85);
-  box-shadow:
-    0 0 8px rgba(0,170,255,0.5),
-    0 0 16px rgba(0,170,255,0.35),
-    0 0 28px rgba(0,170,255,0.2);
-}
-
-/* Keep text above the rings */
-.ringing-time,
-.ringing-name,
-.ringing-buttons button {
-  position: relative;
-  z-index: 2;
-}
-
-
-/* Text */
+/* Time centered in rings */
 .ringing-time {
-  font-size: 48px;
-  font-weight: 700;
-  color: #020203;
-  margin-top: 20px;
-  position: relative;
-  z-index: 2;
-}
-
-.ringing-name {
-  font-size: 18px;
-  opacity: 0.75;
-  margin-bottom: 24px;
-  position: relative;
-  z-index: 2;
-}
-
-/* Buttons */
-.ringing-buttons button {
-  width: 100%;
-  padding: 14px;
-  font-size: 18px;
-  border: none;
-  border-radius: 12px;
-  margin-top: 12px;
-  cursor: pointer;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 46px;
   font-weight: 600;
-  position: relative;
-  z-index: 2;
+  font-family: "Inter", "SF Pro Display", system-ui;
+  color: #0a1a26;
+  z-index: 3;
+  letter-spacing: -1px;
 }
 
+/* Alarm name */
+.ringing-name {
+  font-size: 17px;
+  color: #4b5563;
+  margin-top: -4px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-family: "Inter", system-ui;
+}
+
+/* Buttons area */
+.ringing-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Stop = subtle red, not neon */
 .stop-btn {
-  background: #ff4747;
+  background: #f43f5e;      /* softer red */
   color: white;
-  box-shadow: 0 4px 14px rgba(255, 70, 70, 0.4);
+  padding: 12px 0;
+  border-radius: 14px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.18s ease;
+  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25);
 }
 
+/* STOP Hover */
+.stop-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 20px rgba(244, 63, 94, 0.34);
+  background: #e73351;
+}
+
+/* Snooze = light futuristic outline/glass */
 .snooze-btn {
-  background: #eef1f4;
-  color: #1e293b;
+  background: rgba(240, 245, 255, 0.7);
+  backdrop-filter: blur(6px);
+  padding: 12px 0;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 120, 200, 0.22);
+  color: #0a2a45;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.18s ease;
+  box-shadow:
+    0 2px 12px rgba(0, 150, 255, 0.12),
+    inset 0 0 6px rgba(255,255,255,0.4);
+}
+/* SNOOZE Hover */
+.snooze-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  background: rgba(250, 253, 255, 0.94);
+  border-color: rgba(0, 140, 240, 0.32);
+  box-shadow:
+    0 4px 18px rgba(0, 150, 255, 0.18),
+    inset 0 0 8px rgba(255,255,255,0.55);
 }

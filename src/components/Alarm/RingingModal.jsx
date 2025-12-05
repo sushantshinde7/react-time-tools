@@ -8,25 +8,22 @@ export default function RingingModal({ alarm, onStop, onSnooze }) {
     <div className="ringing-overlay">
       <div className="ringing-card scale-in">
 
-        {/* Smaller animation */}
-        <div className="ringing-animation">
-          <div className="rect rect-1"></div>
-          <div className="rect rect-2"></div>
-          <div className="rect rect-3"></div>
-          <div className="rect rect-4"></div>
-          <div className="rect rect-5"></div>
-          <div className="rect rect-6"></div>
-          <div className="rect rect-7"></div>
-          <div className="rect rect-8"></div>
-          <div className="rect rect-9"></div>
-          <div className="rect rect-10"></div>
-          <div className="rect rect-11"></div>
-          <div className="rect rect-12"></div>
+        {/* Ripple Background Animation */}
+        <div className="ring-wrapper">
+          <div className="ringing-animation">
+            {[...Array(12)].map((_, i) => (
+              <div key={i} className={`rect rect-${i + 1}`}></div>
+            ))}
+          </div>
+
+          {/* Time centered inside rings */}
+          <h1 className="ringing-time">{alarm.time}</h1>
         </div>
 
-        <h1 className="ringing-time">{alarm.time}</h1>
+        {/* Alarm Label */}
         <p className="ringing-name">{alarm.name || "Alarm"}</p>
 
+        {/* Buttons */}
         <div className="ringing-buttons">
           <button className="stop-btn" onClick={onStop}>Stop</button>
           {alarm.snooze && (
@@ -37,4 +34,5 @@ export default function RingingModal({ alarm, onStop, onSnooze }) {
     </div>
   );
 }
+
 
