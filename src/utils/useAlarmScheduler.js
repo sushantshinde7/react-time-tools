@@ -15,8 +15,11 @@ export default function useAlarmScheduler(
       const m = now.getMinutes();
       const nowKey = `${h}:${m}`;
 
+      let triggered = false; // <= to break early
+
       setAlarms((prev) =>
         prev.map((alarm) => {
+          if (triggered) return alarm; // <= skip rest after 1 match
           if (!alarm.isOn) return alarm;
 
           // Prevent double trigger
@@ -29,7 +32,7 @@ export default function useAlarmScheduler(
           if (ampm === "PM" && ah !== 12) ah += 12;
           if (ampm === "AM" && ah === 12) ah = 0;
 
-          // Check time match
+          // Time match
           if (ah === h && am === m) {
             // Custom repeat check
             if (alarm.repeatMode === "custom") {
@@ -39,19 +42,15 @@ export default function useAlarmScheduler(
             }
 
             // --- START RINGING ---
+            triggered = true;
             setRingingAlarm(alarm);
 
-            // stop old audio
-            if (audioRef.current) {
-              audioRef.current.pause();
-            }
+            if (audioRef.current) audioRef.current.pause();
 
-            // Pick ringtone from preloaded bank
             const selected =
               audioBank.current[alarm.ringtone] ||
-              audioBank.current["airtel"]; // fallback
+              audioBank.current["airtel"];
 
-            // Assign + play
             audioRef.current = selected;
             audioRef.current.currentTime = 0;
             audioRef.current.loop = true;
@@ -69,8 +68,8 @@ export default function useAlarmScheduler(
       );
     };
 
-    const interval = setInterval(checkAlarm, 2000);
+    // 🔹 Updated from 2000 → 1000 (1 sec)
+    const interval = setInterval(checkAlarm, 1000);
     return () => clearInterval(interval);
   }, [alarms, audioBank]); // rerun only when alarms change
 }
-
