@@ -3,6 +3,9 @@ import "./AlarmPopup.css";
 import TimeStepper from "./TimeStepper";
 
 const AlarmPopup = ({ onClose, onSave }) => {
+  // -----------------------------
+  // TIME HELPERS
+  // -----------------------------
   const getCurrentTime = () => {
     const now = new Date();
     let h = now.getHours();
@@ -14,22 +17,27 @@ const AlarmPopup = ({ onClose, onSave }) => {
 
   const [alarmTime, setAlarmTime] = useState(getCurrentTime());
   const [alarmName, setAlarmName] = useState("");
+
+  // ringtone name only → audio handled globally in Alarm.jsx
   const [ringtone, setRingtone] = useState("airtel");
   const [ringtoneOpen, setRingtoneOpen] = useState(false);
 
-  const ringtoneMap = {
-    airtel: "/src/sounds/airtel.mp3",
-    docomo: "/src/sounds/docomo.mp3",
-    realme: "/src/sounds/realme.mp3",
-    reliance: "/src/sounds/reliance.mp3",
-    galaxy1: "/src/sounds/galaxy_1.mp3",
-    galaxy2: "/src/sounds/galaxy_2.mp3",
-    nokia: "/src/sounds/nokia_classic.mp3"
-  };
-  const ringtoneOptions = Object.keys(ringtoneMap);
+  const ringtoneOptions = [
+    "airtel",
+    "docomo",
+    "realme",
+    "reliance",
+    "galaxy_1",
+    "galaxy_2",
+    "nokia_classic",
+  ];
 
-  const audioRef = useRef(null);
+  // preview audio (for user testing ringtone)
+  const previewRef = useRef(null);
 
+  // -----------------------------
+  // REPEAT MODE
+  // -----------------------------
   const [repeatMode, setRepeatMode] = useState("once");
   const [repeatDays, setRepeatDays] = useState([]);
   const toggleDay = (day) => {
@@ -38,9 +46,13 @@ const AlarmPopup = ({ onClose, onSave }) => {
     );
   };
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
   const [vibrate, setVibrate] = useState(true);
   const [snooze, setSnooze] = useState(true);
 
+  // -----------------------------
+  // REMAINING TIME CALC
+  // -----------------------------
   const [remainingTime, setRemainingTime] = useState("");
   const calculateRemainingTime = (timeStr) => {
     if (!timeStr) return "";
@@ -66,6 +78,9 @@ const AlarmPopup = ({ onClose, onSave }) => {
     setRemainingTime(calculateRemainingTime(alarmTime));
   }, [alarmTime]);
 
+  // -----------------------------
+  // SAVE
+  // -----------------------------
   const handleSave = () => {
     const newAlarm = {
       id: Date.now(),
@@ -73,30 +88,41 @@ const AlarmPopup = ({ onClose, onSave }) => {
       name: alarmName,
       repeatMode,
       repeatDays,
-      ringtone,
+      ringtone, // only "airtel", "docomo", etc.
       vibrate,
       snooze,
       isOn: true,
     };
-    console.log("NEW ALARM OBJECT:", newAlarm);
+
     onSave(newAlarm);
   };
 
-  // --------------------------
-  // Smooth open/close handling
-  // --------------------------
+  // -----------------------------
+  // Smooth open/close animation
+  // -----------------------------
   const [isVisible, setIsVisible] = useState(true);
-
   const handleClose = () => {
-    setIsVisible(false); // trigger closing animation
-    setTimeout(() => {
-      onClose(); // actually close after animation
-    }, 280); // duration should match CSS animation
+    setIsVisible(false);
+    setTimeout(() => onClose(), 280);
+  };
+
+  // -----------------------------
+  // PREVIEW RINGTONE (small test)
+  // -----------------------------
+  const previewSound = (name) => {
+    if (previewRef.current) {
+      previewRef.current.pause();
+      previewRef.current.currentTime = 0;
+    }
+
+    previewRef.current = new Audio(`/src/sounds/${name}.mp3`);
+    previewRef.current.play();
   };
 
   return (
     <div className={`alarm-popup-overlay ${isVisible ? "fade-in" : "fade-out"}`}>
       <div className={`alarm-popup ${isVisible ? "slide-up" : "slide-down"}`}>
+
         {/* Header */}
         <div className="popup-header">
           <button className="popup-close" onClick={handleClose}>×</button>
@@ -131,6 +157,7 @@ const AlarmPopup = ({ onClose, onSave }) => {
                 Custom
               </button>
             </div>
+
             <div className={`repeat-days-row-wrapper ${repeatMode === "custom" ? "open" : ""}`}>
               <div className="repeat-days-row">
                 {days.map((day) => (
@@ -168,6 +195,7 @@ const AlarmPopup = ({ onClose, onSave }) => {
               {ringtone}
               <span className={`rt-arrow ${ringtoneOpen ? "open" : ""}`}>▼</span>
             </div>
+
             <div className={`ringtone-list-wrapper ${ringtoneOpen ? "open" : ""}`}>
               <div className="ringtone-list">
                 {ringtoneOptions.map((name) => (
@@ -177,12 +205,7 @@ const AlarmPopup = ({ onClose, onSave }) => {
                     onClick={() => {
                       setRingtone(name);
                       setRingtoneOpen(false);
-                      if (audioRef.current) {
-                        audioRef.current.pause();
-                        audioRef.current.currentTime = 0;
-                      }
-                      audioRef.current = new Audio(ringtoneMap[name]);
-                      audioRef.current.play();
+                      previewSound(name);
                     }}
                   >
                     {name}
@@ -206,6 +229,7 @@ const AlarmPopup = ({ onClose, onSave }) => {
                 <span className="popup-slider"></span>
               </label>
             </div>
+
             <div className="toggle-row">
               <span>Snooze</span>
               <label className="popup-switch">
@@ -218,6 +242,7 @@ const AlarmPopup = ({ onClose, onSave }) => {
               </label>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -225,4 +250,3 @@ const AlarmPopup = ({ onClose, onSave }) => {
 };
 
 export default AlarmPopup;
-
