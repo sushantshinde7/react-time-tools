@@ -75,15 +75,25 @@ const Alarm = () => {
   // SCHEDULER HOOK
   // (now receives audioBank + audioRef)
   // ----------------------------------------
-  useAlarmScheduler(alarms, setAlarms, setRingingAlarm, audioRef, audioBank);
+  useAlarmScheduler(alarms, setAlarms,ringingAlarm, setRingingAlarm, audioRef, audioBank);
 
   // ----------------------------------------
   // STOP + SNOOZE
   // ----------------------------------------
   const stopAlarm = () => {
-    if (audioRef.current) audioRef.current.pause();
-    setRingingAlarm(null);
-  };
+  if (audioRef.current) audioRef.current.pause();
+
+  setAlarms((prev) =>
+    prev.map((a) =>
+      a.id === ringingAlarm.id
+        ? { ...a, isOn: false } // disable after stop
+        : a
+    )
+  );
+
+  setRingingAlarm(null);
+};
+
 
   const handleSnooze = () => {
     const snoozeMins = 5;
