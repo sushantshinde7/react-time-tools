@@ -38,7 +38,7 @@ const Alarm = () => {
       "reliance",
       "galaxy_1",
       "galaxy_2",
-      "nokia_classic"
+      "nokia_classic",
     ];
 
     sounds.forEach((name) => {
@@ -47,10 +47,14 @@ const Alarm = () => {
   }, []);
 
   // ----------------------------------------
-  // SAVE TO LS
+  // SAVE TO LOCAL STORAGE (debounced 150ms)
   // ----------------------------------------
   useEffect(() => {
-    localStorage.setItem("alarms", JSON.stringify(alarms));
+    const timer = setTimeout(() => {
+      localStorage.setItem("alarms", JSON.stringify(alarms));
+    }, 150);
+
+    return () => clearTimeout(timer); // cleanup if alarms change quickly
   }, [alarms]);
 
   // ----------------------------------------
@@ -120,7 +124,6 @@ const Alarm = () => {
   // ----------------------------------------
   return (
     <div className="alarm-container">
-
       {/* NAV */}
       <div className="alarm-nav" ref={navRef}>
         <button
@@ -160,9 +163,7 @@ const Alarm = () => {
                 alarm={alarm}
                 onToggle={(id) =>
                   setAlarms((prev) =>
-                    prev.map((a) =>
-                      a.id === id ? { ...a, isOn: !a.isOn } : a
-                    )
+                    prev.map((a) => (a.id === id ? { ...a, isOn: !a.isOn } : a))
                   )
                 }
               />
