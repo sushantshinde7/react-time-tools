@@ -7,7 +7,6 @@ import RingingModal from "./RingingModal";
 import useAlarmScheduler from "../../utils/useAlarmScheduler";
 
 const Alarm = () => {
-
   // ----------------------------------------
   // LOCAL STORAGE
   // ----------------------------------------
@@ -25,18 +24,37 @@ const Alarm = () => {
   const [editMode, setEditMode] = useState(false);
   const navRef = useRef(null);
 
-  // GLOBAL AUDIO REF
+  // ----------------------------------------
+  // AUDIO BANK (PRELOADED) + GLOBAL AUDIO REF
+  // ----------------------------------------
+  const audioBank = useRef({});
   const audioRef = useRef(null);
 
+  useEffect(() => {
+    const sounds = [
+      "airtel",
+      "docomo",
+      "realme",
+      "reliance",
+      "galaxy_1",
+      "galaxy_2",
+      "nokia_classic"
+    ];
+
+    sounds.forEach((name) => {
+      audioBank.current[name] = new Audio(`/src/sounds/${name}.mp3`);
+    });
+  }, []);
+
   // ----------------------------------------
-  // SAVE TO LOCAL STORAGE
+  // SAVE TO LS
   // ----------------------------------------
   useEffect(() => {
     localStorage.setItem("alarms", JSON.stringify(alarms));
   }, [alarms]);
 
   // ----------------------------------------
-  // CLICK OUTSIDE EDIT-MODE
+  // CLICK OUTSIDE EDIT MODE
   // ----------------------------------------
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -47,17 +65,17 @@ const Alarm = () => {
 
     if (editMode) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-
   }, [editMode]);
 
-  // -------------------------------------------------------
-  // 🔥 SCHEDULER MOVED TO CUSTOM HOOK
-  // -------------------------------------------------------
-  useAlarmScheduler(alarms, setAlarms, setRingingAlarm, audioRef);
+  // ----------------------------------------
+  // SCHEDULER HOOK
+  // (now receives audioBank + audioRef)
+  // ----------------------------------------
+  useAlarmScheduler(alarms, setAlarms, setRingingAlarm, audioRef, audioBank);
 
-  // -------------------------------------------------------
+  // ----------------------------------------
   // STOP + SNOOZE
-  // -------------------------------------------------------
+  // ----------------------------------------
   const stopAlarm = () => {
     if (audioRef.current) audioRef.current.pause();
     setRingingAlarm(null);
@@ -70,7 +88,7 @@ const Alarm = () => {
       prev.map((a) => {
         if (a.id !== ringingAlarm.id) return a;
 
-        // convert current alarm time to 24hr
+        // Convert current alarm time to Date()
         const [time, ampm] = a.time.split(" ");
         let [hh, mm] = time.split(":").map(Number);
 
@@ -97,9 +115,9 @@ const Alarm = () => {
     stopAlarm();
   };
 
-  // -------------------------------------------------------
+  // ----------------------------------------
   // UI
-  // -------------------------------------------------------
+  // ----------------------------------------
   return (
     <div className="alarm-container">
 

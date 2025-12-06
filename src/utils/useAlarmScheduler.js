@@ -1,9 +1,13 @@
 // src/utils/useAlarmScheduler.js
-
 import { useEffect } from "react";
 
-export default function useAlarmScheduler(alarms, setAlarms, setRingingAlarm, audioRef) {
-
+export default function useAlarmScheduler(
+  alarms,
+  setAlarms,
+  setRingingAlarm,
+  audioRef,
+  audioBank
+) {
   useEffect(() => {
     const checkAlarm = () => {
       const now = new Date();
@@ -15,37 +19,41 @@ export default function useAlarmScheduler(alarms, setAlarms, setRingingAlarm, au
         prev.map((alarm) => {
           if (!alarm.isOn) return alarm;
 
-          // avoid duplicate
+          // Prevent double trigger
           if (alarm.lastTriggered === nowKey) return alarm;
 
-          // convert alarm time
+          // Convert alarm time → 24hr
           const [time, ampm] = alarm.time.split(" ");
           let [ah, am] = time.split(":").map(Number);
 
           if (ampm === "PM" && ah !== 12) ah += 12;
           if (ampm === "AM" && ah === 12) ah = 0;
 
-          // match
+          // Check time match
           if (ah === h && am === m) {
-            // custom repeat check
+            // Custom repeat check
             if (alarm.repeatMode === "custom") {
               const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
               const today = days[now.getDay()];
               if (!alarm.repeatDays.includes(today)) return alarm;
             }
 
-            // start ringing
+            // --- START RINGING ---
             setRingingAlarm(alarm);
 
-            // PLAY sound looping
+            // stop old audio
             if (audioRef.current) {
               audioRef.current.pause();
             }
-            audioRef.current = new Audio(
-              alarm.ringtone
-                ? `/src/sounds/${alarm.ringtone}.mp3`
-                : "/src/sounds/airtel.mp3"
-            );
+
+            // Pick ringtone from preloaded bank
+            const selected =
+              audioBank.current[alarm.ringtone] ||
+              audioBank.current["airtel"]; // fallback
+
+            // Assign + play
+            audioRef.current = selected;
+            audioRef.current.currentTime = 0;
             audioRef.current.loop = true;
             audioRef.current.play();
 
@@ -63,6 +71,6 @@ export default function useAlarmScheduler(alarms, setAlarms, setRingingAlarm, au
 
     const interval = setInterval(checkAlarm, 2000);
     return () => clearInterval(interval);
-
-  }, [alarms]); // <--- triggers when alarms list updates
+  }, [alarms, audioBank]); // rerun only when alarms change
 }
+
