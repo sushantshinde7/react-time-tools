@@ -4,6 +4,7 @@ import { useEffect } from "react";
 export default function useAlarmScheduler(
   alarms,
   setAlarms,
+  ringingAlarm, 
   setRingingAlarm,
   audioRef,
   audioBank
@@ -22,6 +23,10 @@ export default function useAlarmScheduler(
           if (triggered) return alarm; // <= skip rest after 1 match
           if (!alarm.isOn) return alarm;
 
+          // 🚫 Already ringing? → Do NOT restart audio again
+          if (ringingAlarm && ringingAlarm.id === alarm.id) {
+            return alarm;
+          }
           // Prevent double trigger
           if (alarm.lastTriggered === nowKey) return alarm;
 
@@ -48,8 +53,7 @@ export default function useAlarmScheduler(
             if (audioRef.current) audioRef.current.pause();
 
             const selected =
-              audioBank.current[alarm.ringtone] ||
-              audioBank.current["airtel"];
+              audioBank.current[alarm.ringtone] || audioBank.current["airtel"];
 
             audioRef.current = selected;
             audioRef.current.currentTime = 0;
