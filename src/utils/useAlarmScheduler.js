@@ -15,81 +15,79 @@ export default function useAlarmScheduler(
       const h = now.getHours();
       const m = now.getMinutes();
       const nowKey = `${h}:${m}`;
-      let triggered = false;
 
-      // STEP 1: GROUP alarms by their minute
+      // ACTIVE alarms only
+      const active = alarms.filter((a) => a.isOn);
+
+      // ---- NEW FIX ----
+      // Separate snoozed + normal alarms
+      const snoozed = active.filter((a) => a.isSnoozeInstance);
+      const normal = active.filter((a) => !a.isSnoozeInstance);
+
+      // Build ONE list but prioritize snoozed ONLY for matching minute
+      const toCheck = [...snoozed, ...normal];
+
+      // Group by minute
       const grouped = {};
-      alarms.forEach((a) => {
-        if (!a.isOn) return;
-
+      toCheck.forEach((a) => {
         const [time, ampm] = a.time.split(" ");
         let [hh, mm] = time.split(":").map(Number);
 
         if (ampm === "PM" && hh !== 12) hh += 12;
         if (ampm === "AM" && hh === 12) hh = 0;
 
-        const k = `${hh}:${mm}`;
-        if (!grouped[k]) grouped[k] = [];
-        grouped[k].push(a);
+        const key = `${hh}:${mm}`;
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(a);
       });
 
-      // FIX: sort using id (because alarms have no createdAt)
+      // Sort by createdAt consistently
       Object.keys(grouped).forEach((k) => {
-        grouped[k].sort((a, b) => a.id - b.id);
+        grouped[k].sort((a, b) => a.createdAt - b.createdAt);
       });
 
-      const minuteGroup = grouped[nowKey] || [];
+      const queueThisMinute = grouped[nowKey] || [];
 
-      // STEP 2: If something already ringing → don't retrigger others
-      if (ringingAlarm) {
-        return; // Keep only current alarm ringing
-      }
+      // Already ringing? Stop here
+      if (ringingAlarm) return;
 
-      // STEP 3: If minute matches → ring next alarm in queue
-      if (minuteGroup.length > 0) {
-        const first = minuteGroup[0];
+      // Nothing to ring this minute
+      if (queueThisMinute.length === 0) return;
 
-        // prevent double trigger
-        if (first.lastTriggered === nowKey) return;
+      // PRIORITY FIX:
+      // If snoozed alarms exist for this minute, use them first
+      const snoozedThisMinute = queueThisMinute.filter((a) => a.isSnoozeInstance);
+      const ringQueue =
+        snoozedThisMinute.length > 0 ? snoozedThisMinute : queueThisMinute;
 
-        triggered = true;
-        setRingingAlarm(first);
+      // Take first in queue
+      const first = ringQueue[0];
 
-        // play sound
-        if (audioRef.current) audioRef.current.pause();
-        audioRef.current = audioBank.current[first.ringtone];
-        audioRef.current.currentTime = 0;
-        audioRef.current.loop = true;
-        audioRef.current.play();
+      setRingingAlarm(first);
 
-        // mark queue pending for this minute
-        setAlarms((prev) =>
-          prev.map((a) => {
-            // fix: use "a", not undefined variable "alarm"
-            if (a.id === first.id) {
-              return {
-                ...a,
-                lastTriggered: nowKey,
-                queuePending: true,
-                isOn: true,
-              };
-            }
+      // Play audio
+      if (audioRef.current) audioRef.current.pause();
+      audioRef.current = audioBank.current[first.ringtone];
+      audioRef.current.currentTime = 0;
+      audioRef.current.loop = true;
+      audioRef.current.play();
 
-            // other alarms same minute → queue pending
-            if (minuteGroup.some((g) => g.id === a.id)) {
-              return { ...a, queuePending: true };
-            }
-
-            return a;
-          })
-        );
-
-        return;
-      }
+      // Mark queuePending only for those in this minute
+      setAlarms((prev) =>
+        prev.map((a) => {
+          if (ringQueue.some((g) => g.id === a.id)) {
+            return {
+              ...a,
+              lastTriggered: nowKey,
+              queuePending: true,
+            };
+          }
+          return a;
+        })
+      );
     };
 
     const interval = setInterval(checkAlarm, 1000);
     return () => clearInterval(interval);
-
   }, [alarms, ringingAlarm]);
 }

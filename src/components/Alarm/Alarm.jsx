@@ -88,52 +88,77 @@ const Alarm = () => {
   // STOP + SNOOZE
   // ----------------------------------------
   const stopAlarm = () => {
-    if (audioRef.current) audioRef.current.pause();
+  if (audioRef.current) audioRef.current.pause();
 
-    setAlarms((prev) =>
-      prev.map((a) =>
-        a.id === ringingAlarm.id
-          ? { ...a, isOn: a.repeatMode === "once" ? false : a.isOn }
-          : a
-      )
-    );
+  const isSnoozed = ringingAlarm.isSnoozeInstance;
+  const parentId = ringingAlarm.parentId;
 
-    setRingingAlarm(null);
-  };
+  setAlarms((prev) =>
+    prev
+      .filter((a) => {
+        // DELETE only temporary snooze
+        if (isSnoozed && a.id === ringingAlarm.id) return false;
+        return true;
+      })
+      .map((a) => {
+        // Original alarm: turn off only if one-time
+        if (!isSnoozed && a.id === ringingAlarm.id) {
+          return { ...a, isOn: a.repeatMode === "once" ? false : a.isOn };
+        }
+        return a;
+      })
+  );
+
+  setRingingAlarm(null);
+};
+
 
   const handleSnooze = () => {
-    const snoozeMins = 5;
+  const snoozeMins = 5;
 
-    setAlarms((prev) =>
-      prev.map((a) => {
-        if (a.id !== ringingAlarm.id) return a;
+  const origin = ringingAlarm; // store original alarm
 
-        // Convert current alarm time to Date()
-        const [time, ampm] = a.time.split(" ");
-        let [hh, mm] = time.split(":").map(Number);
+  const [time, ampm] = origin.time.split(" ");
+  let [hh, mm] = time.split(":").map(Number);
+  if (ampm === "PM" && hh !== 12) hh += 12;
+  if (ampm === "AM" && hh === 12) hh = 0;
 
-        if (ampm === "PM" && hh !== 12) hh += 12;
-        if (ampm === "AM" && hh === 12) hh = 0;
+  const d = new Date();
+  d.setHours(hh, mm + snoozeMins);
 
-        const d = new Date();
-        d.setHours(hh, mm + snoozeMins);
+  let newH = d.getHours();
+  const newM = d.getMinutes();
+  const newAmpm = newH >= 12 ? "PM" : "AM";
+  newH = newH % 12 || 12;
 
-        let newH = d.getHours();
-        const newM = d.getMinutes();
+  const newTime =
+    `${String(newH).padStart(2, "0")}:` +
+    `${String(newM).padStart(2, "0")} ${newAmpm}`;
 
-        const newAmpm = newH >= 12 ? "PM" : "AM";
-        newH = newH % 12 || 12;
-
-        const newTime =
-          `${String(newH).padStart(2, "0")}:` +
-          `${String(newM).padStart(2, "0")} ${newAmpm}`;
-
-        return { ...a, time: newTime, isOn: true };
-      })
-    );
-
-    stopAlarm();
+  const snoozeAlarm = {
+    id: origin.id + "_snooze_" + Date.now(),
+    parentId: origin.id,
+    createdAt: Date.now(),
+    isSnoozeInstance: true,
+    queuePending: false,
+    time: newTime,
+    name: origin.name + " (Snoozed)",
+    repeatMode: "once",
+    repeatDays: [],
+    ringtone: origin.ringtone,
+    vibrate: origin.vibrate,
+    snooze: origin.snooze,
+    isOn: true,
+    lastTriggered: null,
   };
+
+  // Add snoozed alarm
+  setAlarms((prev) => [...prev, snoozeAlarm]);
+
+  // Stop ringing original
+  stopAlarm();
+};
+
 
   // ----------------------------------------
   // UI
