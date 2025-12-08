@@ -4,7 +4,7 @@ import { useEffect } from "react";
 export default function useAlarmScheduler(
   alarms,
   setAlarms,
-  ringingAlarm, 
+  ringingAlarm,
   setRingingAlarm,
   audioRef,
   audioBank
@@ -15,65 +15,81 @@ export default function useAlarmScheduler(
       const h = now.getHours();
       const m = now.getMinutes();
       const nowKey = `${h}:${m}`;
+      let triggered = false;
 
-      let triggered = false; // <= to break early
+      // STEP 1: GROUP alarms by their minute
+      const grouped = {};
+      alarms.forEach((a) => {
+        if (!a.isOn) return;
 
-      setAlarms((prev) =>
-        prev.map((alarm) => {
-          if (triggered) return alarm; // <= skip rest after 1 match
-          if (!alarm.isOn) return alarm;
+        const [time, ampm] = a.time.split(" ");
+        let [hh, mm] = time.split(":").map(Number);
 
-          // 🚫 Already ringing? → Do NOT restart audio again
-          if (ringingAlarm && ringingAlarm.id === alarm.id) {
-            return alarm;
-          }
-          // Prevent double trigger
-          if (alarm.lastTriggered === nowKey) return alarm;
+        if (ampm === "PM" && hh !== 12) hh += 12;
+        if (ampm === "AM" && hh === 12) hh = 0;
 
-          // Convert alarm time → 24hr
-          const [time, ampm] = alarm.time.split(" ");
-          let [ah, am] = time.split(":").map(Number);
+        const k = `${hh}:${mm}`;
+        if (!grouped[k]) grouped[k] = [];
+        grouped[k].push(a);
+      });
 
-          if (ampm === "PM" && ah !== 12) ah += 12;
-          if (ampm === "AM" && ah === 12) ah = 0;
+      // FIX: sort using id (because alarms have no createdAt)
+      Object.keys(grouped).forEach((k) => {
+        grouped[k].sort((a, b) => a.id - b.id);
+      });
 
-          // Time match
-          if (ah === h && am === m) {
-            // Custom repeat check
-            if (alarm.repeatMode === "custom") {
-              const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-              const today = days[now.getDay()];
-              if (!alarm.repeatDays.includes(today)) return alarm;
+      const minuteGroup = grouped[nowKey] || [];
+
+      // STEP 2: If something already ringing → don't retrigger others
+      if (ringingAlarm) {
+        return; // Keep only current alarm ringing
+      }
+
+      // STEP 3: If minute matches → ring next alarm in queue
+      if (minuteGroup.length > 0) {
+        const first = minuteGroup[0];
+
+        // prevent double trigger
+        if (first.lastTriggered === nowKey) return;
+
+        triggered = true;
+        setRingingAlarm(first);
+
+        // play sound
+        if (audioRef.current) audioRef.current.pause();
+        audioRef.current = audioBank.current[first.ringtone];
+        audioRef.current.currentTime = 0;
+        audioRef.current.loop = true;
+        audioRef.current.play();
+
+        // mark queue pending for this minute
+        setAlarms((prev) =>
+          prev.map((a) => {
+            // fix: use "a", not undefined variable "alarm"
+            if (a.id === first.id) {
+              return {
+                ...a,
+                lastTriggered: nowKey,
+                queuePending: true,
+                isOn: true,
+              };
             }
 
-            // --- START RINGING ---
-            triggered = true;
-            setRingingAlarm(alarm);
+            // other alarms same minute → queue pending
+            if (minuteGroup.some((g) => g.id === a.id)) {
+              return { ...a, queuePending: true };
+            }
 
-            if (audioRef.current) audioRef.current.pause();
+            return a;
+          })
+        );
 
-            const selected =
-              audioBank.current[alarm.ringtone] || audioBank.current["airtel"];
-
-            audioRef.current = selected;
-            audioRef.current.currentTime = 0;
-            audioRef.current.loop = true;
-            audioRef.current.play();
-
-            return {
-              ...alarm,
-              lastTriggered: nowKey,
-              isOn: alarm.repeatMode === "once" ? false : true,
-            };
-          }
-
-          return alarm;
-        })
-      );
+        return;
+      }
     };
 
-    // 🔹 Updated from 2000 → 1000 (1 sec)
     const interval = setInterval(checkAlarm, 1000);
     return () => clearInterval(interval);
-  }, [alarms, audioBank]); // rerun only when alarms change
+
+  }, [alarms, ringingAlarm]);
 }

@@ -82,17 +82,20 @@ const AlarmPopup = ({ onClose, onSave }) => {
   // SAVE
   // -----------------------------
   const handleSave = () => {
-    const newAlarm = {
-      id: Date.now(),
-      time: alarmTime,
-      name: alarmName,
-      repeatMode,
-      repeatDays,
-      ringtone, // only "airtel", "docomo", etc.
-      vibrate,
-      snooze,
-      isOn: true,
-    };
+  const newAlarm = {
+    id: Date.now(),
+    createdAt: Date.now(),     // 🆕 needed for queue order
+    queuePending: false,        // 🆕 used for scheduler queueing
+    time: alarmTime,
+    name: alarmName,
+    repeatMode,
+    repeatDays,
+    ringtone,
+    vibrate,
+    snooze,
+    isOn: true,
+    lastTriggered: null,
+  };
 
     onSave(newAlarm);
   };
