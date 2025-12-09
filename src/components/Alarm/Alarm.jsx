@@ -87,78 +87,174 @@ const Alarm = () => {
   // ----------------------------------------
   // STOP + SNOOZE
   // ----------------------------------------
+  // ---------- REPLACE YOUR stopAlarm() WITH THIS ----------
   const stopAlarm = () => {
-  if (audioRef.current) audioRef.current.pause();
+    if (audioRef.current) audioRef.current.pause();
 
-  const isSnoozed = ringingAlarm.isSnoozeInstance;
-  const parentId = ringingAlarm.parentId;
+    const isSnoozed = ringingAlarm?.isSnoozeInstance;
+    const finishedId = ringingAlarm?.id;
 
-  setAlarms((prev) =>
-    prev
-      .filter((a) => {
-        // DELETE only temporary snooze
-        if (isSnoozed && a.id === ringingAlarm.id) return false;
+    // compute nowKey for marking lastTriggered (prevent re-trigger inside same minute)
+    const now = new Date();
+    const nowKey = `${now.getHours()}:${now.getMinutes()}`;
+
+    // helper: today's day string (e.g. "Mon")
+    const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const today = dayMap[now.getDay()];
+
+    setAlarms((prev) => {
+      // 1) Remove temporary snooze if this was one
+      let updated = prev.filter((a) => {
+        if (isSnoozed && a.id === finishedId) return false;
         return true;
-      })
-      .map((a) => {
-        // Original alarm: turn off only if one-time
-        if (!isSnoozed && a.id === ringingAlarm.id) {
-          return { ...a, isOn: a.repeatMode === "once" ? false : a.isOn };
+      });
+
+      // 2) For original alarm: handle stop behaviour precisely
+      updated = updated.map((a) => {
+        if (!isSnoozed && a.id === finishedId) {
+          // CASE A: once alarms -> keep current perfect behaviour (turn OFF)
+          if (a.repeatMode === "once") {
+            return {
+              ...a,
+              lastTriggered: nowKey,
+              queuePending: false,
+              isOn: false,
+            };
+          }
+
+          // CASE B: custom with NO days selected -> behaves like once (turn OFF)
+          if (
+            a.repeatMode === "custom" &&
+            (!a.repeatDays || a.repeatDays.length === 0)
+          ) {
+            return {
+              ...a,
+              lastTriggered: nowKey,
+              queuePending: false,
+              isOn: false,
+              // keep repeatMode as custom or convert to once if you prefer:
+              // repeatMode: "once"
+            };
+          }
+
+          // CASE C: custom WITH days -> consume today's slot only
+          if (a.repeatMode === "custom" && Array.isArray(a.repeatDays)) {
+            if (a.repeatDays.includes(today)) {
+              const updatedDays = a.repeatDays.filter((d) => d !== today);
+              return {
+                ...a,
+                repeatDays: updatedDays,
+                lastTriggered: nowKey,
+                queuePending: false,
+                isOn: updatedDays.length > 0, // turn OFF if no days left
+              };
+            } else {
+              // alarm shouldn't have rung if today not selected, but defensively mark lastTriggered
+              return {
+                ...a,
+                lastTriggered: nowKey,
+                queuePending: false,
+              };
+            }
+          }
+
+          // CASE D: other repeating types (daily / weekdays / weekends / etc.)
+          // Mark lastTriggered so we don't retrigger in same minute, keep it ON.
+          return {
+            ...a,
+            lastTriggered: nowKey,
+            queuePending: false,
+          };
         }
         return a;
-      })
-  );
+      });
 
-  setRingingAlarm(null);
-};
+      return updated;
+    });
 
-
-  const handleSnooze = () => {
-  const snoozeMins = 5;
-
-  const origin = ringingAlarm; // store original alarm
-
-  const [time, ampm] = origin.time.split(" ");
-  let [hh, mm] = time.split(":").map(Number);
-  if (ampm === "PM" && hh !== 12) hh += 12;
-  if (ampm === "AM" && hh === 12) hh = 0;
-
-  const d = new Date();
-  d.setHours(hh, mm + snoozeMins);
-
-  let newH = d.getHours();
-  const newM = d.getMinutes();
-  const newAmpm = newH >= 12 ? "PM" : "AM";
-  newH = newH % 12 || 12;
-
-  const newTime =
-    `${String(newH).padStart(2, "0")}:` +
-    `${String(newM).padStart(2, "0")} ${newAmpm}`;
-
-  const snoozeAlarm = {
-    id: origin.id + "_snooze_" + Date.now(),
-    parentId: origin.id,
-    createdAt: Date.now(),
-    isSnoozeInstance: true,
-    queuePending: false,
-    time: newTime,
-    name: origin.name + " (Snoozed)",
-    repeatMode: "once",
-    repeatDays: [],
-    ringtone: origin.ringtone,
-    vibrate: origin.vibrate,
-    snooze: origin.snooze,
-    isOn: true,
-    lastTriggered: null,
+    // clear ringingAlarm to allow next in queue
+    setRingingAlarm(null);
   };
 
-  // Add snoozed alarm
-  setAlarms((prev) => [...prev, snoozeAlarm]);
+  const handleSnooze = () => {
+    const origin = ringingAlarm;
+    if (!origin) return;
 
-  // Stop ringing original
-  stopAlarm();
-};
+    const snoozeMins = 5;
 
+    // Prevent creating duplicate snooze instance for same parent while one already exists
+    const exists = alarms.some(
+      (a) => a.parentId === origin.id && a.isSnoozeInstance && a.isOn
+    );
+    if (exists) {
+      // ignore extra snooze presses while a snooze instance is active
+      // optionally you can provide user feedback here
+      // e.g. toast "Snooze already scheduled"
+      // but for now just return
+      // still stop the current ringing (so user can press Stop)
+      if (audioRef.current) audioRef.current.pause();
+      setRingingAlarm(null);
+      return;
+    }
+
+    const [time, ampm] = origin.time.split(" ");
+    let [hh, mm] = time.split(":").map(Number);
+    if (ampm === "PM" && hh !== 12) hh += 12;
+    if (ampm === "AM" && hh === 12) hh = 0;
+
+    const d = new Date();
+    d.setHours(hh, mm + snoozeMins);
+
+    let newH = d.getHours();
+    const newM = d.getMinutes();
+    const newAmpm = newH >= 12 ? "PM" : "AM";
+    newH = newH % 12 || 12;
+
+    const newTime =
+      `${String(newH).padStart(2, "0")}:` +
+      `${String(newM).padStart(2, "0")} ${newAmpm}`;
+
+    const snoozeAlarm = {
+      id: origin.id + "_snooze_" + Date.now(),
+      parentId: origin.id,
+      createdAt: Date.now(),
+      isSnoozeInstance: true,
+      queuePending: false,
+      time: newTime,
+      name: (origin.name || "Alarm") + " (Snoozed)",
+      repeatMode: "once",
+      repeatDays: [],
+      ringtone: origin.ringtone,
+      vibrate: origin.vibrate,
+      snooze: origin.snooze,
+      isOn: true,
+      lastTriggered: null,
+    };
+
+    // Add snoozed alarm (only once)
+    setAlarms((prev) => [...prev, snoozeAlarm]);
+
+    // Stop ringing original (and mark lastTriggered so it won't re-trigger)
+    if (audioRef.current) audioRef.current.pause();
+
+    const now = new Date();
+    const nowKey = `${now.getHours()}:${now.getMinutes()}`;
+
+    setAlarms((prev) =>
+      prev.map((a) =>
+        a.id === origin.id
+          ? {
+              ...a,
+              lastTriggered: nowKey,
+              queuePending: false,
+              isOn: a.repeatMode === "once" ? false : a.isOn,
+            }
+          : a
+      )
+    );
+
+    setRingingAlarm(null);
+  };
 
   // ----------------------------------------
   // UI

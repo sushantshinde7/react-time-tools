@@ -47,10 +47,30 @@ export default function useAlarmScheduler(
                 // remove snooze instance
                 if (a.isSnoozeInstance) return null;
 
-                // one-time alarms -> turn off
-                if (a.repeatMode === "once") {
+                // --- FIX 2: once OR custom → turn OFF on stop ---
+                // if once OR custom with no days -> turn off
+                const noDays =
+                  a.repeatMode === "custom" &&
+                  (!a.repeatDays || a.repeatDays.length === 0);
+
+                if (a.repeatMode === "once" || noDays) {
                   return { ...a, isOn: false, queuePending: false };
                 }
+
+                // if custom WITH days and today is included -> remove TODAY from repeatDays
+                if (a.repeatMode === "custom" && a.repeatDays.includes(today)) {
+                  const updatedDays = a.repeatDays.filter((d) => d !== today);
+
+                  return {
+                    ...a,
+                    repeatDays: updatedDays,
+                    isOn: updatedDays.length > 0, // turn ON only if days remain
+                    queuePending: false,
+                  };
+                }
+
+                // daily/weekdays/weekends behave normally:
+                return { ...a, queuePending: false };
 
                 // repeating -> keep on, clear queuePending
                 return { ...a, queuePending: false };
@@ -73,7 +93,6 @@ export default function useAlarmScheduler(
       const active = alarms.filter((a) => a.isOn);
 
       // remove expired snooze instances (their minute already passed)
-      // This prevents "future" snoozes from blocking when their minute is past.
       const cleanedActive = active.filter((a) => {
         if (!a.isSnoozeInstance) return true;
 
@@ -85,17 +104,37 @@ export default function useAlarmScheduler(
         const alarmMinutes = hh * 60 + mm;
         const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
-        // if snooze time already strictly before current minute -> drop it
-        // allow snooze that equals current minute
         if (alarmMinutes < nowMinutes) return false;
         return true;
       });
 
-      // group all cleanedActive alarms by hh:mm
+      // ---------- FIX 1 — Convert custom with NO days → once ----------
+      const normalizedActive = cleanedActive.map((a) => {
+        if (
+          a.repeatMode === "custom" &&
+          (!a.repeatDays || a.repeatDays.length === 0)
+        ) {
+          return { ...a, repeatMode: "once" };
+        }
+        return a;
+      });
+
+      // ---------- FILTER BY TODAY for custom repeat alarms ----------
+      const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      const today = dayMap[new Date().getDay()];
+
+      const validForToday = normalizedActive.filter((a) => {
+        if (a.isSnoozeInstance) return true;
+        if (a.repeatMode !== "custom") return true;
+        return a.repeatDays?.includes(today);
+      });
+
+      // ---------- GROUP ONLY validToday alarms ----------
       const grouped = {};
-      cleanedActive.forEach((a) => {
+      validForToday.forEach((a) => {
         const [time, ampm] = a.time.split(" ");
         let [hh, mm] = time.split(":").map(Number);
+
         if (ampm === "PM" && hh !== 12) hh += 12;
         if (ampm === "AM" && hh === 12) hh = 0;
 
@@ -104,7 +143,7 @@ export default function useAlarmScheduler(
         grouped[key].push(a);
       });
 
-      // stable sort each group's queue by createdAt then id as tiebreaker
+      // stable sort
       Object.keys(grouped).forEach((k) => {
         grouped[k].sort((a, b) => {
           const ca = a.createdAt ?? a.id;
@@ -115,42 +154,46 @@ export default function useAlarmScheduler(
         });
       });
 
-      const queueThisMinute = grouped[nowKey] || [];
+      const queueThisMinute = (grouped[nowKey] || []).filter((a) =>
+        validForToday.includes(a)
+      );
 
-      // If an alarm is already ringing, do nothing here (we wait until stop)
+      // already ringing? do nothing
       if (ringingAlarm) return;
 
-      // nothing to do for this minute
+      // avoid re-triggering in same minute
+      const alreadyTriggeredThisMinute = queueThisMinute.filter(
+        (a) => a.lastTriggered === nowKey
+      );
+      if (alreadyTriggeredThisMinute.length > 0) return;
+
       if (queueThisMinute.length === 0) return;
 
-      // pick snoozed alarms that are due now
-      const snoozedThisMinute = queueThisMinute.filter((a) => a.isSnoozeInstance);
+      // snooze priority
+      const snoozedThisMinute = queueThisMinute.filter(
+        (a) => a.isSnoozeInstance
+      );
+      const ringQueue =
+        snoozedThisMinute.length > 0 ? snoozedThisMinute : queueThisMinute;
 
-      // decide which queue to use: snoozed for this minute wins, otherwise all alarms this minute
-      const ringQueue = snoozedThisMinute.length > 0 ? snoozedThisMinute : queueThisMinute;
-
-      // first in queue = FIFO by createdAt
       const first = ringQueue[0];
       if (!first) return;
 
-      // set ringing state with timestamp so auto-dismiss works
+      // set ringing state
       setRingingAlarm({ ...first, startedAt: Date.now() });
 
       // play audio
       if (audioRef.current) audioRef.current.pause();
-      const sound = audioBank.current[first.ringtone] || audioBank.current["airtel"];
+      const sound =
+        audioBank.current[first.ringtone] || audioBank.current["airtel"];
       audioRef.current = sound;
       try {
         audioRef.current.currentTime = 0;
-      } catch (e) {
-        // some browsers may throw if not allowed yet
-      }
+      } catch (e) {}
       audioRef.current.loop = true;
-      audioRef.current.play().catch(() => {
-        // ignore play failures (autoplay restrictions)
-      });
+      audioRef.current.play().catch(() => {});
 
-      // mark queuePending + lastTriggered for those in this minute (ringQueue)
+      // mark triggered
       setAlarms((prev) =>
         prev.map((a) => {
           if (ringQueue.some((g) => g.id === a.id)) {
