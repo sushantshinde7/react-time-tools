@@ -276,7 +276,8 @@ const AlarmPopup = ({ onClose, onSave }) => {
                         e.stopPropagation();
                         togglePreview(name);
                       }}
-                      className="preview-btn"
+                      className={`preview-btn ${previewing === name ? "playing" : ""}`}
+                      aria-pressed={previewing === name}
                     >
                       {previewing === name ? "⏹" : "▶"}
                     </button>

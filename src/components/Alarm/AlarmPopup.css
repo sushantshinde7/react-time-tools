@@ -371,6 +371,63 @@
 .rt-check {
   font-size: 14px;
 }
+/* Inline preview button — neutral, compact */
+.preview-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;         /* small square that's easy to tap */
+  height: 34px;
+  padding: 0;
+  margin-left: 8px;        /* spacing from ringtone name */
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;      /* matches soft rounded card look */
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease, transform 0.12s ease, border-color 0.15s ease;
+  color: #0f1724;          /* dark text/icon color on neutral bg */
+  box-shadow: none;
+}
+
+/* Hover — subtle lift */
+.preview-btn:hover {
+  background: rgba(15, 23, 36, 0.04);
+  transform: translateY(-1px);
+  border-color: rgba(15,23,36,0.06);
+}
+
+/* Focus — keyboard accessibility */
+.preview-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+  border-color: rgba(37,99,235,0.18);
+}
+
+/* Playing / Active state (use class .playing) */
+.preview-btn.playing {
+  background: #2563eb;     /* primary blue fill */
+  color: #ffffff;          /* white icon when playing */
+  border-color: rgba(37,99,235,0.18);
+  transform: none;
+}
+
+/* Smaller visual for very narrow rows (optional) */
+.ringtone-item .preview-btn {
+  min-width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+/* Keep button visually consistent when the parent row is active (selected ringtone) */
+.ringtone-item.active .preview-btn {
+  background: rgba(255,255,255,0.06); /* subtle contrast on blue row */
+  color: #ffffff;
+  border-color: transparent;
+}
 
 /* Toggle rows */
 .toggle-wrapper {
