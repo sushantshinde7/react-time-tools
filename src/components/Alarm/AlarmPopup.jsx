@@ -12,7 +12,10 @@ const AlarmPopup = ({ onClose, onSave }) => {
     const m = now.getMinutes();
     const ampm = h >= 12 ? "PM" : "AM";
     h = h % 12 || 12;
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")} ${ampm}`;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(
+      2,
+      "0"
+    )} ${ampm}`;
   };
 
   const [alarmTime, setAlarmTime] = useState(getCurrentTime());
@@ -32,8 +35,41 @@ const AlarmPopup = ({ onClose, onSave }) => {
     "nokia_classic",
   ];
 
-  // preview audio (for user testing ringtone)
+  // -----------------------------
+  // PREVIEW RINGTONE
+  // -----------------------------
   const previewRef = useRef(null);
+  const [previewing, setPreviewing] = useState(null);
+
+  // GLOBAL STOP PREVIEW (correct location)
+  const stopPreview = () => {
+    if (previewRef.current) {
+      previewRef.current.pause();
+      previewRef.current.currentTime = 0;
+    }
+    setPreviewing(null);
+  };
+
+  const togglePreview = (name) => {
+    // If clicking stop on the same ringtone
+    if (previewing === name) {
+      stopPreview();
+      return;
+    }
+
+    // Stop previous preview
+    stopPreview();
+
+    // Start new preview
+    previewRef.current = new Audio(`/src/sounds/${name}.mp3`);
+    previewRef.current.play();
+    setPreviewing(name);
+  };
+
+  // Stop preview when popup closes
+  useEffect(() => {
+    return () => stopPreview();
+  }, []);
 
   // -----------------------------
   // REPEAT MODE
@@ -82,20 +118,20 @@ const AlarmPopup = ({ onClose, onSave }) => {
   // SAVE
   // -----------------------------
   const handleSave = () => {
-  const newAlarm = {
-    id: Date.now(),
-    createdAt: Date.now(),     // 🆕 needed for queue order
-    queuePending: false,        // 🆕 used for scheduler queueing
-    time: alarmTime,
-    name: alarmName,
-    repeatMode,
-    repeatDays,
-    ringtone,
-    vibrate,
-    snooze,
-    isOn: true,
-    lastTriggered: null,
-  };
+    const newAlarm = {
+      id: Date.now(),
+      createdAt: Date.now(),
+      queuePending: false,
+      time: alarmTime,
+      name: alarmName,
+      repeatMode,
+      repeatDays,
+      ringtone,
+      vibrate,
+      snooze,
+      isOn: true,
+      lastTriggered: null,
+    };
 
     onSave(newAlarm);
   };
@@ -109,28 +145,20 @@ const AlarmPopup = ({ onClose, onSave }) => {
     setTimeout(() => onClose(), 280);
   };
 
-  // -----------------------------
-  // PREVIEW RINGTONE (small test)
-  // -----------------------------
-  const previewSound = (name) => {
-    if (previewRef.current) {
-      previewRef.current.pause();
-      previewRef.current.currentTime = 0;
-    }
-
-    previewRef.current = new Audio(`/src/sounds/${name}.mp3`);
-    previewRef.current.play();
-  };
-
   return (
-    <div className={`alarm-popup-overlay ${isVisible ? "fade-in" : "fade-out"}`}>
+    <div
+      className={`alarm-popup-overlay ${isVisible ? "fade-in" : "fade-out"}`}
+    >
       <div className={`alarm-popup ${isVisible ? "slide-up" : "slide-down"}`}>
-
         {/* Header */}
         <div className="popup-header">
-          <button className="popup-close" onClick={handleClose}>×</button>
+          <button className="popup-close" onClick={handleClose}>
+            ×
+          </button>
           <h3 className="popup-title">New Alarm</h3>
-          <button className="popup-save" onClick={handleSave}>✓</button>
+          <button className="popup-save" onClick={handleSave}>
+            ✓
+          </button>
         </div>
 
         <div className="popup-scroll">
@@ -148,25 +176,35 @@ const AlarmPopup = ({ onClose, onSave }) => {
             <h4>Repeat</h4>
             <div className="repeat-section">
               <button
-                className={`repeat-btn ${repeatMode === "once" ? "active" : ""}`}
+                className={`repeat-btn ${
+                  repeatMode === "once" ? "active" : ""
+                }`}
                 onClick={() => setRepeatMode("once")}
               >
                 Ring Once
               </button>
               <button
-                className={`repeat-btn ${repeatMode === "custom" ? "active" : ""}`}
+                className={`repeat-btn ${
+                  repeatMode === "custom" ? "active" : ""
+                }`}
                 onClick={() => setRepeatMode("custom")}
               >
                 Custom
               </button>
             </div>
 
-            <div className={`repeat-days-row-wrapper ${repeatMode === "custom" ? "open" : ""}`}>
+            <div
+              className={`repeat-days-row-wrapper ${
+                repeatMode === "custom" ? "open" : ""
+              }`}
+            >
               <div className="repeat-days-row">
                 {days.map((day) => (
                   <div
                     key={day}
-                    className={`day-chip ${repeatDays.includes(day) ? "selected" : ""}`}
+                    className={`day-chip ${
+                      repeatDays.includes(day) ? "selected" : ""
+                    }`}
                     onClick={() => toggleDay(day)}
                   >
                     {day}
@@ -191,28 +229,57 @@ const AlarmPopup = ({ onClose, onSave }) => {
           {/* Ringtone */}
           <div className="popup-section">
             <h4>Ringtone</h4>
+
             <div
               className="ringtone-selected"
-              onClick={() => setRingtoneOpen(!ringtoneOpen)}
+              onClick={() =>
+                setRingtoneOpen((prev) => {
+                  const next = !prev;
+                  if (!next) stopPreview(); // dropdown collapsed
+                  return next;
+                })
+              }
             >
               {ringtone}
-              <span className={`rt-arrow ${ringtoneOpen ? "open" : ""}`}>▼</span>
+              <span className={`rt-arrow ${ringtoneOpen ? "open" : ""}`}>
+                ▼
+              </span>
             </div>
 
-            <div className={`ringtone-list-wrapper ${ringtoneOpen ? "open" : ""}`}>
+            <div
+              className={`ringtone-list-wrapper ${ringtoneOpen ? "open" : ""}`}
+            >
               <div className="ringtone-list">
                 {ringtoneOptions.map((name) => (
                   <div
                     key={name}
-                    className={`ringtone-item ${ringtone === name ? "active" : ""}`}
-                    onClick={() => {
-                      setRingtone(name);
-                      setRingtoneOpen(false);
-                      previewSound(name);
-                    }}
+                    className={`ringtone-item ${
+                      ringtone === name ? "active" : ""
+                    }`}
                   >
-                    {name}
-                    {ringtone === name && <span className="rt-check">✓</span>}
+                    <span
+                      onClick={() => {
+                        setRingtone(name);
+                        setRingtoneOpen(false);
+                        stopPreview(); // stop preview when an option is selected
+                      }}
+                      style={{ flex: 1 }}
+                    >
+                      {name}
+                      {ringtone === name && (
+                        <span className="rt-check"> ✓</span>
+                      )}
+                    </span>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        togglePreview(name);
+                      }}
+                      className="preview-btn"
+                    >
+                      {previewing === name ? "⏹" : "▶"}
+                    </button>
                   </div>
                 ))}
               </div>
@@ -245,7 +312,6 @@ const AlarmPopup = ({ onClose, onSave }) => {
               </label>
             </div>
           </div>
-
         </div>
       </div>
     </div>
