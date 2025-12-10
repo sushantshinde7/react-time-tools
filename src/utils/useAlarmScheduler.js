@@ -1,15 +1,13 @@
-// src/utils/useAlarmScheduler.js
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 /**
  * Scheduler behaviour summary:
  * - Always group ALL active alarms by minute (snoozed + normal).
- * - Remove expired snooze instances (time < now) so they don't block.
- * - If there are snoozed alarms for THIS minute, they get priority for this minute.
- * - Otherwise normal alarms for this minute can ring.
- * - Only one alarm rings at a time (ringingAlarm guards this).
- * - When an alarm starts ringing, set startedAt so auto-dismiss works.
- * - Auto-dismiss stops and cleans up only the currently ringing alarm.
+ * - Remove expired snooze instances.
+ * - Snoozed alarms for this minute have priority.
+ * - Only one alarm rings at a time.
+ * - Auto-dismiss after timeout.
+ * - Progressive volume fade-in.
  */
 export default function useAlarmScheduler(
   alarms,
@@ -19,36 +17,46 @@ export default function useAlarmScheduler(
   audioRef,
   audioBank
 ) {
+  const fadeIntervalRef = useRef(null);
+  const startedAtRef = useRef(null);
+
   useEffect(() => {
     const checkAlarm = () => {
-      // ---------- Auto-dismiss (light and safe) ----------
+      // ---------- Auto-dismiss ----------
       if (ringingAlarm) {
         const started = ringingAlarm.startedAt || Date.now();
         const elapsed = Date.now() - started;
-        const AUTO_LIMIT = 3 * 60 * 1000; // 3 minutes
+        const AUTO_LIMIT = 3 * 60 * 1000;
 
         if (elapsed >= AUTO_LIMIT) {
-          // stop audio
           if (audioRef.current) {
             audioRef.current.pause();
             audioRef.current.currentTime = 0;
           }
 
           const id = ringingAlarm.id;
-
-          // clear ringing state and clean only that alarm (non-destructive)
           setRingingAlarm(null);
+          startedAtRef.current = null; // Clear ref on stop
 
+          // ---------- Cleanup alarm ----------
           setAlarms((prev) =>
             prev
               .map((a) => {
                 if (a.id !== id) return a;
 
-                // remove snooze instance
                 if (a.isSnoozeInstance) return null;
 
-                // --- FIX 2: once OR custom → turn OFF on stop ---
-                // if once OR custom with no days -> turn off
+                const dayMap = [
+                  "Sun",
+                  "Mon",
+                  "Tue",
+                  "Wed",
+                  "Thu",
+                  "Fri",
+                  "Sat",
+                ];
+                const today = dayMap[new Date().getDay()];
+
                 const noDays =
                   a.repeatMode === "custom" &&
                   (!a.repeatDays || a.repeatDays.length === 0);
@@ -57,42 +65,32 @@ export default function useAlarmScheduler(
                   return { ...a, isOn: false, queuePending: false };
                 }
 
-                // if custom WITH days and today is included -> remove TODAY from repeatDays
                 if (a.repeatMode === "custom" && a.repeatDays.includes(today)) {
                   const updatedDays = a.repeatDays.filter((d) => d !== today);
-
                   return {
                     ...a,
                     repeatDays: updatedDays,
-                    isOn: updatedDays.length > 0, // turn ON only if days remain
+                    isOn: updatedDays.length > 0,
                     queuePending: false,
                   };
                 }
 
-                // daily/weekdays/weekends behave normally:
-                return { ...a, queuePending: false };
-
-                // repeating -> keep on, clear queuePending
                 return { ...a, queuePending: false };
               })
               .filter(Boolean)
           );
 
-          // stop early — don't run full scheduling logic this tick
           return;
         }
       }
 
-      // ---------- Build grouped map of active alarms ----------
+      // ---------- Build grouped map ----------
       const now = new Date();
-      const nowH = now.getHours();
-      const nowM = now.getMinutes();
-      const nowKey = `${nowH}:${nowM}`;
+      const nowKey = `${now.getHours()}:${now.getMinutes()}`;
 
-      // active alarms only
       const active = alarms.filter((a) => a.isOn);
 
-      // remove expired snooze instances (their minute already passed)
+      // Remove expired snoozes
       const cleanedActive = active.filter((a) => {
         if (!a.isSnoozeInstance) return true;
 
@@ -103,12 +101,10 @@ export default function useAlarmScheduler(
 
         const alarmMinutes = hh * 60 + mm;
         const nowMinutes = now.getHours() * 60 + now.getMinutes();
-
-        if (alarmMinutes < nowMinutes) return false;
-        return true;
+        return alarmMinutes >= nowMinutes;
       });
 
-      // ---------- FIX 1 — Convert custom with NO days → once ----------
+      // Convert custom with NO days → once
       const normalizedActive = cleanedActive.map((a) => {
         if (
           a.repeatMode === "custom" &&
@@ -119,17 +115,17 @@ export default function useAlarmScheduler(
         return a;
       });
 
-      // ---------- FILTER BY TODAY for custom repeat alarms ----------
+      // Filter by today
       const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-      const today = dayMap[new Date().getDay()];
+      const today = dayMap[now.getDay()];
 
       const validForToday = normalizedActive.filter((a) => {
         if (a.isSnoozeInstance) return true;
         if (a.repeatMode !== "custom") return true;
-        return a.repeatDays?.includes(today);
+        return a.repeatDays.includes(today);
       });
 
-      // ---------- GROUP ONLY validToday alarms ----------
+      // Group alarms by hh:mm
       const grouped = {};
       validForToday.forEach((a) => {
         const [time, ampm] = a.time.split(" ");
@@ -143,7 +139,6 @@ export default function useAlarmScheduler(
         grouped[key].push(a);
       });
 
-      // stable sort
       Object.keys(grouped).forEach((k) => {
         grouped[k].sort((a, b) => {
           const ca = a.createdAt ?? a.id;
@@ -158,18 +153,16 @@ export default function useAlarmScheduler(
         validForToday.includes(a)
       );
 
-      // already ringing? do nothing
       if (ringingAlarm) return;
 
-      // avoid re-triggering in same minute
-      const alreadyTriggeredThisMinute = queueThisMinute.filter(
+      const alreadyTriggered = queueThisMinute.filter(
         (a) => a.lastTriggered === nowKey
       );
-      if (alreadyTriggeredThisMinute.length > 0) return;
+      if (alreadyTriggered.length > 0) return;
 
       if (queueThisMinute.length === 0) return;
 
-      // snooze priority
+      // Snooze priority
       const snoozedThisMinute = queueThisMinute.filter(
         (a) => a.isSnoozeInstance
       );
@@ -179,21 +172,53 @@ export default function useAlarmScheduler(
       const first = ringQueue[0];
       if (!first) return;
 
-      // set ringing state
-      setRingingAlarm({ ...first, startedAt: Date.now() });
+      // ---------- START RINGING ----------
+      const startedAt = Date.now();
+      startedAtRef.current = startedAt;
 
-      // play audio
+      setRingingAlarm({ ...first, startedAt });
+      first.startedAt = startedAt;
+
       if (audioRef.current) audioRef.current.pause();
       const sound =
         audioBank.current[first.ringtone] || audioBank.current["airtel"];
       audioRef.current = sound;
+
       try {
         audioRef.current.currentTime = 0;
-      } catch (e) {}
+      } catch {}
+
       audioRef.current.loop = true;
+      audioRef.current.volume = 0.2;
       audioRef.current.play().catch(() => {});
 
-      // mark triggered
+      // Clear old fade interval
+      if (fadeIntervalRef.current) {
+        clearInterval(fadeIntervalRef.current);
+        fadeIntervalRef.current = null;
+      }
+
+      // ---------- Progressive Fade-In ----------
+      fadeIntervalRef.current = setInterval(() => {
+        if (!audioRef.current) {
+          clearInterval(fadeIntervalRef.current);
+          fadeIntervalRef.current = null;
+          return;
+        }
+
+        const elapsed = Date.now() - (startedAtRef.current ?? Date.now());
+
+        if (elapsed >= 30000) {
+          audioRef.current.volume = 1.0;
+          clearInterval(fadeIntervalRef.current);
+          fadeIntervalRef.current = null;
+          return;
+        } else if (elapsed >= 20000) audioRef.current.volume = 0.6;
+        else if (elapsed >= 10000) audioRef.current.volume = 0.4;
+        else audioRef.current.volume = 0.2;
+      }, 1000);
+
+      // ---------- Mark triggered ----------
       setAlarms((prev) =>
         prev.map((a) => {
           if (ringQueue.some((g) => g.id === a.id)) {
@@ -205,6 +230,13 @@ export default function useAlarmScheduler(
     };
 
     const interval = setInterval(checkAlarm, 1000);
-    return () => clearInterval(interval);
+
+    return () => {
+      clearInterval(interval);
+      if (fadeIntervalRef.current) {
+        clearInterval(fadeIntervalRef.current);
+        fadeIntervalRef.current = null;
+      }
+    };
   }, [alarms, ringingAlarm]);
 }

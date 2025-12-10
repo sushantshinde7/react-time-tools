@@ -7,9 +7,6 @@ import RingingModal from "./RingingModal";
 import useAlarmScheduler from "../../utils/useAlarmScheduler";
 
 const Alarm = () => {
-  // ----------------------------------------
-  // LOCAL STORAGE
-  // ----------------------------------------
   const [alarms, setAlarms] = useState(() => {
     try {
       const saved = localStorage.getItem("alarms");
@@ -24,9 +21,6 @@ const Alarm = () => {
   const [editMode, setEditMode] = useState(false);
   const navRef = useRef(null);
 
-  // ----------------------------------------
-  // AUDIO BANK (PRELOADED) + GLOBAL AUDIO REF
-  // ----------------------------------------
   const audioBank = useRef({});
   const audioRef = useRef(null);
 
@@ -40,41 +34,29 @@ const Alarm = () => {
       "galaxy_2",
       "nokia_classic",
     ];
-
     sounds.forEach((name) => {
       audioBank.current[name] = new Audio(`/src/sounds/${name}.mp3`);
     });
   }, []);
 
-  // ----------------------------------------
-  // SAVE TO LOCAL STORAGE (debounced 150ms)
-  // ----------------------------------------
   useEffect(() => {
     const timer = setTimeout(() => {
       localStorage.setItem("alarms", JSON.stringify(alarms));
     }, 150);
-
-    return () => clearTimeout(timer); // cleanup if alarms change quickly
+    return () => clearTimeout(timer);
   }, [alarms]);
 
-  // ----------------------------------------
-  // CLICK OUTSIDE EDIT MODE
-  // ----------------------------------------
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (editMode && navRef.current && !navRef.current.contains(e.target)) {
         setEditMode(false);
       }
     };
-
     if (editMode) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [editMode]);
 
-  // ----------------------------------------
-  // SCHEDULER HOOK
-  // (now receives audioBank + audioRef)
-  // ----------------------------------------
+  // ---------- SCHEDULER HOOK ----------
   useAlarmScheduler(
     alarms,
     setAlarms,
@@ -84,60 +66,41 @@ const Alarm = () => {
     audioBank
   );
 
-  // ----------------------------------------
-  // STOP + SNOOZE
-  // ----------------------------------------
-  // ---------- REPLACE YOUR stopAlarm() WITH THIS ----------
+  // ---------- STOP ALARM ----------
   const stopAlarm = () => {
-    if (audioRef.current) audioRef.current.pause();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current.volume = 1.0;
+    }
+
+    // Stop fade interval if exists
+    if (window.fadeIntervalRef && window.fadeIntervalRef.current) {
+      clearInterval(window.fadeIntervalRef.current);
+      window.fadeIntervalRef.current = null;
+    }
 
     const isSnoozed = ringingAlarm?.isSnoozeInstance;
     const finishedId = ringingAlarm?.id;
-
-    // compute nowKey for marking lastTriggered (prevent re-trigger inside same minute)
     const now = new Date();
     const nowKey = `${now.getHours()}:${now.getMinutes()}`;
-
-    // helper: today's day string (e.g. "Mon")
     const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const today = dayMap[now.getDay()];
 
     setAlarms((prev) => {
-      // 1) Remove temporary snooze if this was one
       let updated = prev.filter((a) => {
         if (isSnoozed && a.id === finishedId) return false;
         return true;
       });
 
-      // 2) For original alarm: handle stop behaviour precisely
       updated = updated.map((a) => {
         if (!isSnoozed && a.id === finishedId) {
-          // CASE A: once alarms -> keep current perfect behaviour (turn OFF)
           if (a.repeatMode === "once") {
-            return {
-              ...a,
-              lastTriggered: nowKey,
-              queuePending: false,
-              isOn: false,
-            };
+            return { ...a, lastTriggered: nowKey, queuePending: false, isOn: false };
           }
-
-          // CASE B: custom with NO days selected -> behaves like once (turn OFF)
-          if (
-            a.repeatMode === "custom" &&
-            (!a.repeatDays || a.repeatDays.length === 0)
-          ) {
-            return {
-              ...a,
-              lastTriggered: nowKey,
-              queuePending: false,
-              isOn: false,
-              // keep repeatMode as custom or convert to once if you prefer:
-              // repeatMode: "once"
-            };
+          if (a.repeatMode === "custom" && (!a.repeatDays || a.repeatDays.length === 0)) {
+            return { ...a, lastTriggered: nowKey, queuePending: false, isOn: false };
           }
-
-          // CASE C: custom WITH days -> consume today's slot only
           if (a.repeatMode === "custom" && Array.isArray(a.repeatDays)) {
             if (a.repeatDays.includes(today)) {
               const updatedDays = a.repeatDays.filter((d) => d !== today);
@@ -146,25 +109,13 @@ const Alarm = () => {
                 repeatDays: updatedDays,
                 lastTriggered: nowKey,
                 queuePending: false,
-                isOn: updatedDays.length > 0, // turn OFF if no days left
+                isOn: updatedDays.length > 0,
               };
             } else {
-              // alarm shouldn't have rung if today not selected, but defensively mark lastTriggered
-              return {
-                ...a,
-                lastTriggered: nowKey,
-                queuePending: false,
-              };
+              return { ...a, lastTriggered: nowKey, queuePending: false };
             }
           }
-
-          // CASE D: other repeating types (daily / weekdays / weekends / etc.)
-          // Mark lastTriggered so we don't retrigger in same minute, keep it ON.
-          return {
-            ...a,
-            lastTriggered: nowKey,
-            queuePending: false,
-          };
+          return { ...a, lastTriggered: nowKey, queuePending: false };
         }
         return a;
       });
@@ -172,26 +123,19 @@ const Alarm = () => {
       return updated;
     });
 
-    // clear ringingAlarm to allow next in queue
     setRingingAlarm(null);
   };
 
+  // ---------- SNOOZE ----------
   const handleSnooze = () => {
     const origin = ringingAlarm;
     if (!origin) return;
-
     const snoozeMins = 5;
 
-    // Prevent creating duplicate snooze instance for same parent while one already exists
     const exists = alarms.some(
       (a) => a.parentId === origin.id && a.isSnoozeInstance && a.isOn
     );
     if (exists) {
-      // ignore extra snooze presses while a snooze instance is active
-      // optionally you can provide user feedback here
-      // e.g. toast "Snooze already scheduled"
-      // but for now just return
-      // still stop the current ringing (so user can press Stop)
       if (audioRef.current) audioRef.current.pause();
       setRingingAlarm(null);
       return;
@@ -211,8 +155,7 @@ const Alarm = () => {
     newH = newH % 12 || 12;
 
     const newTime =
-      `${String(newH).padStart(2, "0")}:` +
-      `${String(newM).padStart(2, "0")} ${newAmpm}`;
+      `${String(newH).padStart(2, "0")}:${String(newM).padStart(2, "0")} ${newAmpm}`;
 
     const snoozeAlarm = {
       id: origin.id + "_snooze_" + Date.now(),
@@ -231,10 +174,8 @@ const Alarm = () => {
       lastTriggered: null,
     };
 
-    // Add snoozed alarm (only once)
     setAlarms((prev) => [...prev, snoozeAlarm]);
 
-    // Stop ringing original (and mark lastTriggered so it won't re-trigger)
     if (audioRef.current) audioRef.current.pause();
 
     const now = new Date();
@@ -256,17 +197,10 @@ const Alarm = () => {
     setRingingAlarm(null);
   };
 
-  // ----------------------------------------
-  // UI
-  // ----------------------------------------
   return (
     <div className="alarm-container">
-      {/* NAV */}
       <div className="alarm-nav" ref={navRef}>
-        <button
-          className={`nav-btn ${editMode ? "active" : ""}`}
-          onClick={() => setEditMode((p) => !p)}
-        >
+        <button className={`nav-btn ${editMode ? "active" : ""}`} onClick={() => setEditMode((p) => !p)}>
           {editMode ? "Done" : "Edit"}
         </button>
 
@@ -284,12 +218,9 @@ const Alarm = () => {
 
         <h2 className="nav-title">Alarm</h2>
 
-        <button className="nav-btn add-btn" onClick={() => setShowPopup(true)}>
-          +
-        </button>
+        <button className="nav-btn add-btn" onClick={() => setShowPopup(true)}>+</button>
       </div>
 
-      {/* LIST */}
       <div className="alarm-list">
         {alarms.length === 0 ? (
           <p className="alarm-list-placeholder">⏰ No alarms added</p>
@@ -298,18 +229,13 @@ const Alarm = () => {
             <div className="alarm-item-wrapper" key={alarm.id}>
               <AlarmItem
                 alarm={alarm}
-                onToggle={(id) =>
-                  setAlarms((prev) =>
-                    prev.map((a) => (a.id === id ? { ...a, isOn: !a.isOn } : a))
-                  )
-                }
+                onToggle={(id) => setAlarms((prev) => prev.map((a) => (a.id === id ? { ...a, isOn: !a.isOn } : a)))}
               />
             </div>
           ))
         )}
       </div>
 
-      {/* POPUP */}
       {showPopup && (
         <AlarmPopup
           onClose={() => setShowPopup(false)}
@@ -320,13 +246,8 @@ const Alarm = () => {
         />
       )}
 
-      {/* RINGING MODAL */}
       {ringingAlarm && (
-        <RingingModal
-          alarm={ringingAlarm}
-          onStop={stopAlarm}
-          onSnooze={handleSnooze}
-        />
+        <RingingModal alarm={ringingAlarm} onStop={stopAlarm} onSnooze={handleSnooze} />
       )}
     </div>
   );
