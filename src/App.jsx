@@ -33,7 +33,7 @@ export default function App() {
         <main className="tab-content">
           <Suspense fallback={<div style={{textAlign:"center", padding:20}}>Loading…</div>}>
             <Routes>
-              <Route path="/" element={<Navigate replace to="/stopwatch" />} />
+              <Route path="/" element={<Navigate replace to="/alarm" />} />
               <Route path="/stopwatch" element={<Stopwatch />} />
               <Route path="/alarm" element={<Alarm />} />
               <Route path="/clock" element={<Clock />} />
