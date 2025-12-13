@@ -1,6 +1,12 @@
 // src/App.jsx
 import React, { Suspense, lazy } from "react";
-import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  NavLink,
+  Navigate,
+} from "react-router-dom";
 import "./App.css";
 
 // lazy load components for better performance (optional)
@@ -16,27 +22,43 @@ export default function App() {
         <h1 className="app-title">Time Tools</h1>
 
         <nav className="tabs" role="tablist" aria-label="Time tools">
-          <NavLink to="/alarm" className={({ isActive }) => `tab ${isActive ? "active" : ""}`}>
+          <NavLink
+            to="/alarm"
+            className={({ isActive }) => `tab ${isActive ? "active" : ""}`}
+          >
             Alarm
           </NavLink>
-          <NavLink to="/clock" className={({ isActive }) => `tab ${isActive ? "active" : ""}`}>
+          <NavLink
+            to="/clock"
+            className={({ isActive }) => `tab ${isActive ? "active" : ""}`}
+          >
             Clock
           </NavLink>
-          <NavLink to="/stopwatch" className={({ isActive }) => `tab ${isActive ? "active" : ""}`}>
+          <NavLink
+            to="/stopwatch"
+            className={({ isActive }) => `tab ${isActive ? "active" : ""}`}
+          >
             Stopwatch
           </NavLink>
-          <NavLink to="/timer" className={({ isActive }) => `tab ${isActive ? "active" : ""}`}>
+          <NavLink
+            to="/timer"
+            className={({ isActive }) => `tab ${isActive ? "active" : ""}`}
+          >
             Timer
           </NavLink>
         </nav>
 
         <main className="tab-content">
-          <Suspense fallback={<div style={{textAlign:"center", padding:20}}>Loading…</div>}>
+          <Suspense
+            fallback={
+              <div style={{ textAlign: "center", padding: 20 }}>Loading…</div>
+            }
+          >
             <Routes>
               <Route path="/" element={<Navigate replace to="/alarm" />} />
-              <Route path="/stopwatch" element={<Stopwatch />} />
               <Route path="/alarm" element={<Alarm />} />
               <Route path="/clock" element={<Clock />} />
+              <Route path="/stopwatch" element={<Stopwatch />} />
               <Route path="/timer" element={<Timer />} />
               {/* 404 fallback */}
               <Route path="*" element={<div style={{padding:20}}>Page not found</div>} />
