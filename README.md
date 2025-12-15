@@ -1,6 +1,10 @@
 # 🕒 React Time Tools
 
 A sleek and minimal **React + Vite** application that combines multiple time-based utilities — **Stopwatch, World Clock, Timer, and Alarm** — in one clean, responsive interface.
+> 🔗 Live Demo: [React Time Tools Live](https://react-time-tools.vercel.app/)
+
+> 📦 Repository: [react-time-tools](https://github.com/sushantshinde7/react-time-tools)
+
 
 This project focuses on modular structure, smooth UI, and modern UX.
 
